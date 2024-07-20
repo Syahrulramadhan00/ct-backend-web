@@ -1,4 +1,4 @@
-package ct_backend
+package main
 
 import (
 	"ct-backend/constants/config"

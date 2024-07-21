@@ -1,7 +1,7 @@
-package config
+package Config
 
 import (
-	"ct-backend/constants"
+	"ct-backend/Constants"
 	"fmt"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -10,7 +10,7 @@ import (
 )
 
 func SetUpDatabaseConnection() *gorm.DB {
-	if os.Getenv("APP_ENV") != constants.ENUM_RUN_PRODUCTION {
+	if os.Getenv("APP_ENV") != Constants.ENUM_RUN_PRODUCTION {
 		err := godotenv.Load(".env")
 		if err != nil {
 			panic(err)

@@ -1,14 +1,14 @@
 package Repository
 
 import (
-	"ct-backend/model"
+	"ct-backend/Model"
 	"gorm.io/gorm"
 )
 
 type (
 	IAuthRepository interface {
 		InsertUserInformation(email string, password string) (err error)
-		GetUserInformation(email string) (user model.User, err error)
+		GetUserInformation(email string) (user *Model.User, err error)
 	}
 
 	AuthRepository struct {
@@ -22,24 +22,24 @@ func AuthRepositoryProvider(DB *gorm.DB) *AuthRepository {
 	}
 }
 
-func (h *AuthRepository) RegisterUser(email string, password string) (err error) {
+func (h *AuthRepository) InsertUserInformation(email string, password string) (err error) {
 	if user, err := h.GetUserInformation(email); err != nil {
 		return err
 	} else if user != nil {
 		return err
 	}
 
-	if err = h.DB.Create(&model.User{Email: email, Password: password}).Error; err != nil {
+	if err = h.DB.Create(&Model.User{Email: email, Password: password}).Error; err != nil {
 		return err
 	}
 
 	return err
 }
 
-func (h *AuthRepository) GetUserInformation(email string) (user *model.User, err error) {
+func (h *AuthRepository) GetUserInformation(email string) (user *Model.User, err error) {
 	if err = h.DB.
-		Find(&model.User{}, "email = ?", email).
-		First(&model.User{}).
+		Find(&Model.User{}, "email = ?", email).
+		First(&Model.User{}).
 		Take(&user).Error; err != nil {
 		return nil, err
 	}

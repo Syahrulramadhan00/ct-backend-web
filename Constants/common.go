@@ -1,4 +1,4 @@
-package constants
+package Constants
 
 const (
 	ENUM_ROLE_ADMIN = "admin"

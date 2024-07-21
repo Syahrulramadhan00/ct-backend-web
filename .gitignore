@@ -2,3 +2,7 @@
 storage/
 assets/
 volumes/
+.idea
+uploads/
+.vscode
+tmp/

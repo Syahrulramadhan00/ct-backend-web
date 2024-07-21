@@ -23,19 +23,29 @@ func AuthControllerProvider(service Services.IAuthService) *AuthController {
 }
 
 func (h *AuthController) Login(ctx *gin.Context) {
-	var loginData Dto.LoginDto
+	var loginRequest Dto.LoginRequest
 
-	if err := ctx.ShouldBind(&loginData); err != nil {
+	if err := ctx.ShouldBind(&loginRequest); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
 		return
 	}
 
-	user, token, err := h.service.Login(loginData.Email, loginData.Password)
+	user, token, err := h.service.Login(loginRequest.Email, loginRequest.Password)
+
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
+		})
+
+		return
+	}
+
+	// check verified status
+	if !user.IsVerified {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "user not verified",
 		})
 
 		return

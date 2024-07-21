@@ -38,7 +38,7 @@ func (h *AuthService) Login(email string, password string) (user *Model.User, to
 	// check password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return nil, "", err
+		return nil, "", errors.New("invalid password")
 	}
 
 	// generate token

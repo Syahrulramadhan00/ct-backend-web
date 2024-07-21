@@ -2,6 +2,7 @@ package Services
 
 import (
 	"ct-backend/Model"
+	"ct-backend/Model/Dto"
 	"ct-backend/Repository"
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
@@ -13,7 +14,7 @@ import (
 type (
 	IAuthService interface {
 		Login(email string, password string) (user *Model.User, token string, err error)
-		Register(email string, password string, username string) (err error)
+		Register(request *Dto.RegisterRequest) (err error)
 	}
 
 	AuthService struct {
@@ -55,13 +56,18 @@ func (h *AuthService) Login(email string, password string) (user *Model.User, to
 	return user, token, err
 }
 
-func (h *AuthService) Register(email string, password string, username string) (err error) {
+func (h *AuthService) Register(request *Dto.RegisterRequest) (err error) {
 	var (
 		hashedPassword []byte
 	)
 
-	hashedPassword, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err = h.repo.InsertUserInformation(email, string(hashedPassword)); err != nil {
+	hashedPassword, err = bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	request.Password = string(hashedPassword)
+
+	if err = h.repo.InsertUserInformation(request); err != nil {
 		return err
 	}
 

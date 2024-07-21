@@ -2,12 +2,14 @@ package Repository
 
 import (
 	"ct-backend/Model"
+	"ct-backend/Model/Dto"
+	"errors"
 	"gorm.io/gorm"
 )
 
 type (
 	IAuthRepository interface {
-		InsertUserInformation(email string, password string) (err error)
+		InsertUserInformation(request *Dto.RegisterRequest) (err error)
 		GetUserInformation(email string) (user *Model.User, err error)
 	}
 
@@ -22,14 +24,18 @@ func AuthRepositoryProvider(DB *gorm.DB) *AuthRepository {
 	}
 }
 
-func (h *AuthRepository) InsertUserInformation(email string, password string) (err error) {
-	if user, err := h.GetUserInformation(email); err != nil {
-		return err
-	} else if user != nil {
-		return err
+func (h *AuthRepository) InsertUserInformation(request *Dto.RegisterRequest) (err error) {
+	if user, _ := h.GetUserInformation(request.Email); user != nil {
+		return errors.New("email already exist")
 	}
 
-	if err = h.DB.Create(&Model.User{Email: email, Password: password}).Error; err != nil {
+	user := &Model.User{
+		Name:     request.Username,
+		Email:    request.Email,
+		Password: request.Password,
+	}
+
+	if err = h.DB.Create(&user).Error; err != nil {
 		return err
 	}
 

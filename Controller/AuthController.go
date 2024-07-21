@@ -51,11 +51,16 @@ func (h *AuthController) Login(ctx *gin.Context) {
 }
 
 func (h *AuthController) Register(ctx *gin.Context) {
-	email := ctx.PostForm("email")
-	password := ctx.PostForm("password")
-	username := ctx.PostForm("username")
+	var registerRequest Dto.RegisterRequest
 
-	err := h.service.Register(email, password, username)
+	if err := ctx.ShouldBind(&registerRequest); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	err := h.service.Register(&registerRequest)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),

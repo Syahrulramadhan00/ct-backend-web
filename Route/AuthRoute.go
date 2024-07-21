@@ -8,10 +8,6 @@ import (
 func InitAuth(c *gin.RouterGroup, db *gorm.DB) {
 	r := AuthDI(db)
 
-	//c.GET("/health", func(c *gin.Context) error {
-	//	return c.SendString("api ok")
-	//})
-
 	c.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "api ok",

@@ -62,7 +62,7 @@ func (h *AuthController) Register(ctx *gin.Context) {
 
 	err := h.service.Register(&registerRequest)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.JSON(http.StatusBadGateway, gin.H{
 			"message": err.Error(),
 		})
 

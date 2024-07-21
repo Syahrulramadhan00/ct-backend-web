@@ -7,7 +7,7 @@ type LoginDto struct {
 }
 
 type RegisterRequest struct {
-	Email    string `json:"email"`
-	Username string `json:"name"`
-	Password string `json:"password"`
+	Email    string `json:"email" binding:"required,email"`
+	Username string `json:"name" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }

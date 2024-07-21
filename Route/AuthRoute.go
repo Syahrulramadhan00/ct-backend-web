@@ -15,4 +15,6 @@ func InitAuth(c *gin.RouterGroup, db *gorm.DB) {
 	})
 	c.POST("/login", r.Login)
 	c.POST("/register", r.Register)
+	c.POST("/request-otp", r.RequestOtp)
+	c.POST("/verify-otp", r.VerifyOtp)
 }

@@ -10,3 +10,12 @@ type RegisterRequest struct {
 	Username string `json:"name" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+
+type OtpRequest struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+type OtpVerificationRequest struct {
+	Email string `json:"email" binding:"required,email"`
+	Otp   string `json:"otp" binding:"required"`
+}

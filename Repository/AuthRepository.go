@@ -11,6 +11,8 @@ type (
 	IAuthRepository interface {
 		InsertUserInformation(request *Dto.RegisterRequest) (err error)
 		GetUserInformation(email string) (user *Model.User, err error)
+		SetOtpCode(email string, otp string) (err error)
+		SetVerificationStatus(email string) (err error)
 	}
 
 	AuthRepository struct {
@@ -51,4 +53,26 @@ func (h *AuthRepository) GetUserInformation(email string) (user *Model.User, err
 	}
 
 	return user, err
+}
+
+func (h *AuthRepository) SetOtpCode(email string, otp string) (err error) {
+	if err := h.DB.Model(&Model.User{}).
+		Where("email = ?", email).
+		Updates(map[string]interface{}{
+			"otp_code": otp,
+		}).Error; err != nil {
+		return err
+	}
+
+	return err
+}
+
+func (h *AuthRepository) SetVerificationStatus(email string) (err error) {
+	if err = h.DB.Model(&Model.User{}).
+		Where("email = ?", email).
+		Update("is_verified", true).Error; err != nil {
+		return err
+	}
+
+	return err
 }

@@ -7,7 +7,9 @@ import (
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"math/rand"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -15,6 +17,8 @@ type (
 	IAuthService interface {
 		Login(email string, password string) (user *Model.User, token string, err error)
 		Register(request *Dto.RegisterRequest) (err error)
+		RequestOtp(email string) (err error)
+		VerifyOtp(email string, otp string) (err error)
 	}
 
 	AuthService struct {
@@ -72,4 +76,42 @@ func (h *AuthService) Register(request *Dto.RegisterRequest) (err error) {
 	}
 
 	return err
+}
+
+func (h *AuthService) RequestOtp(email string) (err error) {
+	randomNumber := rand.Intn(9000) + 1000
+	if err = h.repo.SetOtpCode(email, strconv.Itoa(randomNumber)); err != nil {
+		return err
+	}
+
+	// send otp to email
+
+	return err
+}
+
+func (h *AuthService) VerifyOtp(email string, otp string) (err error) {
+	var (
+		user *Model.User
+	)
+
+	if user, err = h.repo.GetUserInformation(email); err != nil {
+		return err
+	} else if user == nil {
+		return errors.New("user not found")
+	}
+
+	if user.OtpCode != otp {
+		return errors.New("invalid otp")
+	} else {
+
+		if user.UpdatedAt.Before(time.Now().Add(-2 * time.Minute)) {
+			return errors.New("otp expired")
+		}
+
+		if err = h.repo.SetVerificationStatus(email); err != nil {
+			return err
+		}
+	}
+
+	return
 }

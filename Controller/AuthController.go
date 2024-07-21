@@ -11,6 +11,8 @@ type (
 	IAuthController interface {
 		Login(ctx *gin.Context)
 		Register(ctx *gin.Context)
+		RequestOtp(ctx *gin.Context)
+		VerifyOtp(ctx *gin.Context)
 	}
 
 	AuthController struct {
@@ -81,5 +83,53 @@ func (h *AuthController) Register(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "success",
+	})
+}
+
+func (h *AuthController) RequestOtp(ctx *gin.Context) {
+	var otpRequest Dto.OtpRequest
+
+	if err := ctx.ShouldBind(&otpRequest); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	err := h.service.RequestOtp(otpRequest.Email)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "otp sent, please ask admin about the code",
+	})
+}
+
+func (h *AuthController) VerifyOtp(ctx *gin.Context) {
+	var otpVerificationRequest Dto.OtpVerificationRequest
+
+	if err := ctx.ShouldBind(&otpVerificationRequest); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	err := h.service.VerifyOtp(otpVerificationRequest.Email, otpVerificationRequest.Otp)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "otp verified",
 	})
 }

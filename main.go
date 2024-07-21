@@ -7,9 +7,16 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
+	if loc, err := time.LoadLocation("Asia/Jakarta"); err != nil {
+		panic(err)
+	} else {
+		time.Local = loc
+	}
+
 	db := Config.SetUpDatabaseConnection()
 	defer Config.CloseDatabaseConnection(db)
 

@@ -21,3 +21,10 @@ func AuthDI(db *gorm.DB) *Controller.AuthController {
 	authController := Controller.AuthControllerProvider(authService)
 	return authController
 }
+
+func ProductDI(db *gorm.DB) *Controller.ProductController {
+	productRepository := Repository.ProductRepositoryProvider(db)
+	productService := Services.ProductServiceProvider(productRepository)
+	productController := Controller.ProductControllerProvider(productService)
+	return productController
+}

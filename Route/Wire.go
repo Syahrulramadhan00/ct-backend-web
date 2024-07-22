@@ -24,3 +24,17 @@ func AuthDI(db *gorm.DB) *Controller.AuthController {
 	))
 	return &Controller.AuthController{}
 }
+
+func ProductDI(db *gorm.DB) *Controller.ProductController {
+	panic(wire.Build(wire.NewSet(
+		Repository.ProductRepositoryProvider,
+		Services.ProductServiceProvider,
+		Controller.ProductControllerProvider,
+
+		wire.Bind(new(Controller.IProductController), new(*Controller.ProductController)),
+		wire.Bind(new(Services.IProductService), new(*Services.ProductService)),
+		wire.Bind(new(Repository.IProductRepository), new(*Repository.ProductRepository)),
+	),
+	))
+	return &Controller.ProductController{}
+}

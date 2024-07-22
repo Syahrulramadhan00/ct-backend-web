@@ -9,4 +9,5 @@ func Init(c *gin.Engine, db *gorm.DB) {
 	prefix := c.Group("/api/")
 	InitAuth(prefix, db)
 	InitProduct(prefix, db)
+	InitPurchase(prefix, db)
 }

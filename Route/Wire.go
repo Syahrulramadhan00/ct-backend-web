@@ -52,3 +52,19 @@ func CommonMiddlewareDI() *Middleware.CommonMiddleware {
 	))
 	return &Middleware.CommonMiddleware{}
 }
+
+func PurchaseDI(db *gorm.DB) *Controller.PurchaseController {
+	panic(wire.Build(wire.NewSet(
+		Repository.ProductRepositoryProvider,
+		Repository.PurchaseRepositoryProvider,
+		Services.PurchaseServiceProvider,
+		Controller.PurchaseControllerProvider,
+
+		wire.Bind(new(Controller.IPurchaseController), new(*Controller.PurchaseController)),
+		wire.Bind(new(Services.IPurchaseService), new(*Services.PurchaseService)),
+		wire.Bind(new(Repository.IProductRepository), new(*Repository.ProductRepository)),
+		wire.Bind(new(Repository.IPurchaseRepository), new(*Repository.PurchaseRepository)),
+	),
+	))
+	return &Controller.PurchaseController{}
+}

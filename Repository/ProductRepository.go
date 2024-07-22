@@ -79,6 +79,7 @@ func (h *ProductRepository) EditStockProduct(id int, stock int) (err error) {
 }
 
 func (h *ProductRepository) GetProductById(id int) (product *Model.Product, err error) {
+
 	if err := h.DB.
 		Where("id = ?", id).
 		First(&product).Error; err != nil {

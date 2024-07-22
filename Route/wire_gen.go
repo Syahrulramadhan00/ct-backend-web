@@ -36,3 +36,11 @@ func CommonMiddlewareDI() *Middleware.CommonMiddleware {
 	commonMiddleware := Middleware.CommonMiddlewareProvider(jwtService)
 	return commonMiddleware
 }
+
+func PurchaseDI(db *gorm.DB) *Controller.PurchaseController {
+	purchaseRepository := Repository.PurchaseRepositoryProvider(db)
+	productRepository := Repository.ProductRepositoryProvider(db)
+	purchaseService := Services.PurchaseServiceProvider(purchaseRepository, productRepository)
+	purchaseController := Controller.PurchaseControllerProvider(purchaseService)
+	return purchaseController
+}

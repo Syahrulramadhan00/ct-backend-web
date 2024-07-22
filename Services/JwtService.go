@@ -46,7 +46,6 @@ func (h *JwtService) ParseToken(authHeader string) (claims jwt.MapClaims, err er
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		fmt.Println("expired date : ", claims["exp"])
 		return claims, nil
 	} else {
 		return nil, err

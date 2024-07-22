@@ -6,10 +6,8 @@ import (
 	"ct-backend/Repository"
 	"ct-backend/Utils"
 	"errors"
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
-	"os"
 	"strconv"
 	"time"
 )
@@ -26,12 +24,13 @@ type (
 	}
 
 	AuthService struct {
-		repo Repository.IAuthRepository
+		repo       Repository.IAuthRepository
+		jwtService IJwtService
 	}
 )
 
-func AuthServiceProvider(repo Repository.IAuthRepository) *AuthService {
-	return &AuthService{repo: repo}
+func AuthServiceProvider(repo Repository.IAuthRepository, jwtService IJwtService) *AuthService {
+	return &AuthService{repo: repo, jwtService: jwtService}
 }
 
 func (h *AuthService) Login(email string, password string) (user *Model.User, token string, err error) {
@@ -49,15 +48,7 @@ func (h *AuthService) Login(email string, password string) (user *Model.User, to
 		return nil, "", errors.New("invalid password")
 	}
 
-	// generate token
-	expirationTime := time.Now().Add(3 * 30 * 24 * time.Hour)
-
-	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.MapClaims{
-		"sub": user.ID,
-		"exp": expirationTime.Unix(),
-	})
-
-	if token, err = jwtToken.SignedString([]byte(os.Getenv("JWT_SECRET"))); err != nil {
+	if token, err = h.jwtService.GenerateToken(int(user.ID)); err != nil {
 		return nil, "", err
 	}
 

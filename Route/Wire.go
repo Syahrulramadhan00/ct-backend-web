@@ -5,6 +5,7 @@ package Route
 
 import (
 	"ct-backend/Controller"
+	"ct-backend/Middleware"
 	"ct-backend/Repository"
 	"ct-backend/Services"
 	"github.com/google/wire"
@@ -16,10 +17,12 @@ func AuthDI(db *gorm.DB) *Controller.AuthController {
 		Repository.AuthRepositoryProvider,
 		Services.AuthServiceProvider,
 		Controller.AuthControllerProvider,
+		Services.JwtServiceProvider,
 
 		wire.Bind(new(Controller.IAuthController), new(*Controller.AuthController)),
 		wire.Bind(new(Services.IAuthService), new(*Services.AuthService)),
 		wire.Bind(new(Repository.IAuthRepository), new(*Repository.AuthRepository)),
+		wire.Bind(new(Services.IJwtService), new(*Services.JwtService)),
 	),
 	))
 	return &Controller.AuthController{}
@@ -37,4 +40,15 @@ func ProductDI(db *gorm.DB) *Controller.ProductController {
 	),
 	))
 	return &Controller.ProductController{}
+}
+
+func CommonMiddlewareDI() *Middleware.CommonMiddleware {
+	panic(wire.Build(wire.NewSet(
+		Middleware.CommonMiddlewareProvider,
+		Services.JwtServiceProvider,
+
+		wire.Bind(new(Services.IJwtService), new(*Services.JwtService)),
+	),
+	))
+	return &Middleware.CommonMiddleware{}
 }

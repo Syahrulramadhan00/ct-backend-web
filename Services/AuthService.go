@@ -4,6 +4,7 @@ import (
 	"ct-backend/Model"
 	"ct-backend/Model/Dto"
 	"ct-backend/Repository"
+	"ct-backend/Utils"
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -84,7 +85,12 @@ func (h *AuthService) RequestOtp(email string) (err error) {
 		return err
 	}
 
-	// send otp to email
+	if err = Utils.SendEmailToAdmin(
+		"OTP Code for "+email,
+		"Your OTP Code is: "+strconv.Itoa(randomNumber),
+	); err != nil {
+		return err
+	}
 
 	return err
 }
@@ -104,7 +110,7 @@ func (h *AuthService) VerifyOtp(email string, otp string) (err error) {
 		return errors.New("invalid otp")
 	} else {
 
-		if user.UpdatedAt.Before(time.Now().Add(-2 * time.Minute)) {
+		if user.UpdatedAt.Before(time.Now().Add(-5 * time.Minute)) {
 			return errors.New("otp expired")
 		}
 

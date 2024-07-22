@@ -13,6 +13,7 @@ type (
 		GetUserInformation(email string) (user *Model.User, err error)
 		SetOtpCode(email string, otp string) (err error)
 		SetVerificationStatus(email string) (err error)
+		ChangePassword(email string, password string) (err error)
 	}
 
 	AuthRepository struct {
@@ -71,6 +72,16 @@ func (h *AuthRepository) SetVerificationStatus(email string) (err error) {
 	if err = h.DB.Model(&Model.User{}).
 		Where("email = ?", email).
 		Update("is_verified", true).Error; err != nil {
+		return err
+	}
+
+	return err
+}
+
+func (h *AuthRepository) ChangePassword(email string, password string) (err error) {
+	if err = h.DB.Model(&Model.User{}).
+		Where("email = ?", email).
+		Update("password", password).Error; err != nil {
 		return err
 	}
 

@@ -20,6 +20,9 @@ type (
 		Register(request *Dto.RegisterRequest) (err error)
 		RequestOtp(email string) (err error)
 		VerifyOtp(email string, otp string) (err error)
+		RequestForgotPasswordOtp(email string) (err error)
+		VerifyForgotPasswordOtp(email string, otp string) (err error)
+		ChangePassword(email string, password string) (err error)
 	}
 
 	AuthService struct {
@@ -120,4 +123,60 @@ func (h *AuthService) VerifyOtp(email string, otp string) (err error) {
 	}
 
 	return
+}
+
+func (h *AuthService) RequestForgotPasswordOtp(email string) (err error) {
+	randomNumber := rand.Intn(9000) + 1000
+	if err = h.repo.SetOtpCode(email, strconv.Itoa(randomNumber)); err != nil {
+		return err
+	}
+
+	if err = Utils.SendEmail(
+		email,
+		"FORGOT PASSWORD OTP for "+email,
+		"Your OTP Code is: "+strconv.Itoa(randomNumber),
+	); err != nil {
+		return err
+	}
+
+	return err
+}
+
+func (h *AuthService) VerifyForgotPasswordOtp(email string, otp string) (err error) {
+	var (
+		user *Model.User
+	)
+
+	if user, err = h.repo.GetUserInformation(email); err != nil {
+		return err
+	} else if user == nil {
+		return errors.New("user not found")
+	}
+
+	if user.OtpCode != otp {
+		return errors.New("invalid otp")
+	} else {
+		if user.UpdatedAt.Before(time.Now().Add(-5 * time.Minute)) {
+			return errors.New("otp expired")
+		}
+	}
+
+	return err
+}
+
+func (h *AuthService) ChangePassword(email string, password string) (err error) {
+	var (
+		hashedPassword []byte
+	)
+
+	hashedPassword, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	if err = h.repo.ChangePassword(email, string(hashedPassword)); err != nil {
+		return err
+	}
+
+	return nil
 }

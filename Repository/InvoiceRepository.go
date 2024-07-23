@@ -13,7 +13,7 @@ type (
 		Create(request *Dto.CreateInvoiceRequest) (err error)
 		Delete(request Dto.IdRequest) (err error)
 		UpdateDocument(request Dto.UpdateDocumentRequest) (err error)
-		AddSale(request Dto.AddSaleRequest) (err error)
+		AddSale(request *Dto.AddSaleRequest) (err error)
 		UpdateSale(request Dto.AddSaleRequest) (err error)
 		DeleteSale(request Dto.IdRequest) (err error)
 		UpdateFaktur(request Dto.UpdateFakturRequest) (err error)
@@ -88,7 +88,7 @@ func (h *InvoiceRepository) UpdateDocument(request Dto.UpdateDocumentRequest) (e
 	return nil
 }
 
-func (h *InvoiceRepository) AddSale(request Dto.AddSaleRequest) (err error) {
+func (h *InvoiceRepository) AddSale(request *Dto.AddSaleRequest) (err error) {
 	sale := &Model.Sale{
 		InvoiceId:  request.InvoiceId,
 		ProductId:  request.ProductId,

@@ -12,6 +12,7 @@ type (
 		GetAllInvoice() ([]Model.ShortInvoice, error)
 		GetInvoiceById(id int) (Model.Invoice, error)
 		LockInvoice(request *Dto.IdRequest) error
+		AddSaleToInvoice(request *Dto.AddSaleRequest) error
 	}
 
 	InvoiceService struct {
@@ -57,4 +58,8 @@ func (h *InvoiceService) GetInvoiceById(id int) (Model.Invoice, error) {
 
 func (h *InvoiceService) LockInvoice(request *Dto.IdRequest) error {
 	return h.InvoiceRepository.UpdateStatus(Dto.UpdateStatusRequest{InvoiceId: request.Id, InvoiceStatusId: 2})
+}
+
+func (h *InvoiceService) AddSaleToInvoice(request *Dto.AddSaleRequest) error {
+	return h.InvoiceRepository.AddSale(request)
 }

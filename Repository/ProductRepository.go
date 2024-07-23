@@ -11,7 +11,7 @@ type (
 		GetProductByName(name string) (product *Model.Product, err error)
 		GetAllProduct() (products []*Model.Product, err error)
 		EditNameProduct(id int, name string) (err error)
-		EditStockProduct(id int, stock int) (err error)
+		SumStockProduct(id int, stock int) (err error)
 		GetProductById(id int) (product *Model.Product, err error)
 	}
 
@@ -67,11 +67,11 @@ func (h *ProductRepository) EditNameProduct(id int, name string) (err error) {
 	return nil
 }
 
-func (h *ProductRepository) EditStockProduct(id int, stock int) (err error) {
+func (h *ProductRepository) SumStockProduct(id int, stock int) (err error) {
 	if err := h.DB.
 		Model(&Model.Product{}).
 		Where("id = ?", id).
-		Update("stock", stock).Error; err != nil {
+		Update("stock", gorm.Expr("stock + ?", stock)).Error; err != nil {
 		return err
 	}
 

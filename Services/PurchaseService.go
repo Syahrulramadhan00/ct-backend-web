@@ -28,18 +28,12 @@ func PurchaseServiceProvider(purchaseRepository Repository.IPurchaseRepository, 
 }
 
 func (h *PurchaseService) AddPurchase(request *Dto.CreatePurchaseRequest) (err error) {
-	var (
-		product *Model.Product
-	)
-	if product, err = h.ProductRepository.GetProductById(request.ProductId); err != nil {
-		return err
-	}
 
 	if err = h.PurchaseRepository.AddPurchase(request); err != nil {
 		return err
 	}
 
-	if err = h.ProductRepository.EditStockProduct(request.ProductId, product.Stock+request.Count); err != nil {
+	if err = h.ProductRepository.SumStockProduct(request.ProductId, request.Count); err != nil {
 		return err
 	}
 
@@ -56,7 +50,6 @@ func (h *PurchaseService) PayDebt(id int) (err error) {
 
 func (h *PurchaseService) DeletePurchase(id int) (err error) {
 	var (
-		product  *Model.Product
 		purchase *Model.Purchase
 	)
 
@@ -64,11 +57,7 @@ func (h *PurchaseService) DeletePurchase(id int) (err error) {
 		return err
 	}
 
-	if product, err = h.ProductRepository.GetProductById(purchase.ProductId); err != nil {
-		return err
-	}
-
-	if err = h.ProductRepository.EditStockProduct(purchase.ProductId, product.Stock-purchase.Count); err != nil {
+	if err = h.ProductRepository.SumStockProduct(purchase.ProductId, purchase.Count*-1); err != nil {
 		return err
 	}
 

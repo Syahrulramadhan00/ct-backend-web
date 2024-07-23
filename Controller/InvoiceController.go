@@ -14,6 +14,7 @@ type (
 		GetAllInvoice(ctx *gin.Context)
 		GetInvoiceById(ctx *gin.Context)
 		LockInvoice(ctx *gin.Context)
+		AddSaleToInvoice(ctx *gin.Context)
 	}
 
 	InvoiceController struct {
@@ -101,6 +102,28 @@ func (h *InvoiceController) LockInvoice(ctx *gin.Context) {
 	}
 
 	if err := h.InvoiceService.LockInvoice(&id); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "success",
+	})
+}
+
+func (h *InvoiceController) AddSaleToInvoice(ctx *gin.Context) {
+	var request *Dto.AddSaleRequest
+
+	if err := ctx.ShouldBind(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := h.InvoiceService.AddSaleToInvoice(request); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{
 			"message": err.Error(),
 		})

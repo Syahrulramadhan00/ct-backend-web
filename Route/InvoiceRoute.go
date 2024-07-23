@@ -14,4 +14,5 @@ func InitInvoice(c *gin.RouterGroup, db *gorm.DB) {
 	c.GET("/get-all-invoice", r.GetAllInvoice)
 	c.GET("/get-invoice/:id", r.GetInvoiceById)
 	c.POST("/lock-invoice", r.LockInvoice)
+	c.POST("/add-sale-to-invoice", r.AddSaleToInvoice)
 }

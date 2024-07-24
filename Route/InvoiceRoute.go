@@ -15,4 +15,12 @@ func InitInvoice(c *gin.RouterGroup, db *gorm.DB) {
 	c.GET("/get-invoice/:id", r.GetInvoiceById)
 	c.POST("/lock-invoice", r.LockInvoice)
 	c.POST("/add-sale-to-invoice", r.AddSaleToInvoice)
+	c.PUT("/update-sale", r.UpdateSale)
+	c.DELETE("/delete-sale", r.DeleteSale)
+	c.PUT("/update-faktur", r.UpdateFaktur)
+	c.PUT("/update-main-information", r.UpdateMainInformation)
+	c.PUT("/update-note", r.UpdateNote)
+	c.PUT("/update-status", r.UpdateStatus)
+	c.GET("/get-all-sale/:invoiceId", r.GetAllSale)
+	c.DELETE("/delete-invoice", r.DeleteInvoice)
 }

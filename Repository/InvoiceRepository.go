@@ -14,12 +14,13 @@ type (
 		Delete(request Dto.IdRequest) (err error)
 		UpdateDocument(request Dto.UpdateDocumentRequest) (err error)
 		AddSale(request *Dto.AddSaleRequest) (err error)
-		UpdateSale(request Dto.AddSaleRequest) (err error)
+		GetAllSale(invoiceId int) ([]Model.Sale, error)
+		UpdateSale(request *Dto.UpdateSaleRequest) (err error)
 		DeleteSale(request Dto.IdRequest) (err error)
-		UpdateFaktur(request Dto.UpdateFakturRequest) (err error)
-		UpdateMainInformation(request Dto.UpdateMainInformationRequest) (err error)
-		UpdateNote(request Dto.UpdateNoteRequest) (err error)
-		UpdateStatus(request Dto.UpdateStatusRequest) (err error)
+		UpdateFaktur(request *Dto.UpdateFakturRequest) (err error)
+		UpdateMainInformation(request *Dto.UpdateMainInformationRequest) (err error)
+		UpdateNote(request *Dto.UpdateNoteRequest) (err error)
+		UpdateStatus(request *Dto.UpdateStatusRequest) (err error)
 	}
 
 	InvoiceRepository struct {
@@ -104,7 +105,7 @@ func (h *InvoiceRepository) AddSale(request *Dto.AddSaleRequest) (err error) {
 	return nil
 }
 
-func (h *InvoiceRepository) UpdateSale(request Dto.AddSaleRequest) (err error) {
+func (h *InvoiceRepository) UpdateSale(request *Dto.UpdateSaleRequest) (err error) {
 	if err := h.DB.
 		Model(&Model.Sale{}).
 		Where("id = ?", request.Id).
@@ -117,14 +118,31 @@ func (h *InvoiceRepository) UpdateSale(request Dto.AddSaleRequest) (err error) {
 }
 
 func (h *InvoiceRepository) DeleteSale(request Dto.IdRequest) (err error) {
-	if err := h.DB.Where("id = ?", request.Id).Delete(&Model.Sale{}).Error; err != nil {
+	tx := h.DB.Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	var sale Model.Sale
+	if err := tx.First(&sale, request.Id).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 
-	return nil
+	if err := tx.Model(&Model.Product{}).Where("id = ?", sale.ProductId).Update("stock", gorm.Expr("stock + ?", sale.Quantity)).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Delete(&sale).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
-func (h *InvoiceRepository) UpdateFaktur(request Dto.UpdateFakturRequest) (err error) {
+func (h *InvoiceRepository) UpdateFaktur(request *Dto.UpdateFakturRequest) (err error) {
 	if err := h.DB.
 		Model(&Model.Invoice{}).
 		Where("id = ?", request.InvoiceId).
@@ -137,7 +155,7 @@ func (h *InvoiceRepository) UpdateFaktur(request Dto.UpdateFakturRequest) (err e
 	return nil
 }
 
-func (h *InvoiceRepository) UpdateMainInformation(request Dto.UpdateMainInformationRequest) (err error) {
+func (h *InvoiceRepository) UpdateMainInformation(request *Dto.UpdateMainInformationRequest) (err error) {
 	if err := h.DB.
 		Model(&Model.Invoice{}).
 		Where("id = ?", request.InvoiceId).
@@ -154,7 +172,7 @@ func (h *InvoiceRepository) UpdateMainInformation(request Dto.UpdateMainInformat
 	return nil
 }
 
-func (h *InvoiceRepository) UpdateNote(request Dto.UpdateNoteRequest) (err error) {
+func (h *InvoiceRepository) UpdateNote(request *Dto.UpdateNoteRequest) (err error) {
 	if err := h.DB.
 		Model(&Model.Invoice{}).
 		Where("id = ?", request.InvoiceId).
@@ -165,7 +183,7 @@ func (h *InvoiceRepository) UpdateNote(request Dto.UpdateNoteRequest) (err error
 	return nil
 }
 
-func (h *InvoiceRepository) UpdateStatus(request Dto.UpdateStatusRequest) (err error) {
+func (h *InvoiceRepository) UpdateStatus(request *Dto.UpdateStatusRequest) (err error) {
 	if err := h.DB.
 		Model(&Model.Invoice{}).
 		Where("id = ?", request.InvoiceId).
@@ -174,4 +192,12 @@ func (h *InvoiceRepository) UpdateStatus(request Dto.UpdateStatusRequest) (err e
 	}
 
 	return nil
+}
+
+func (h *InvoiceRepository) GetAllSale(invoiceId int) (sales []Model.Sale, err error) {
+	if err := h.DB.Where("invoice_id = ?", invoiceId).Find(&sales).Error; err != nil {
+		return nil, err
+	}
+
+	return sales, nil
 }

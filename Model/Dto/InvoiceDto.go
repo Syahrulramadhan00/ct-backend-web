@@ -19,9 +19,17 @@ type AddSaleRequest struct {
 	Price     int `json:"price" binding:"required"`
 }
 
+type UpdateSaleRequest struct {
+	Id           int `json:"id"`
+	ProductId    int `json:"product_id" binding:"required"`
+	CurrentCount int `json:"current_count" binding:"required"`
+	Count        int `json:"count" binding:"required"`
+	Price        int `json:"price" binding:"required"`
+}
+
 type UpdateFakturRequest struct {
 	InvoiceId int    `json:"invoice_id" binding:"required"`
-	Discount  int    `json:"discount" binding:"required"`
+	Discount  int    `json:"discount"`
 	Deadline  string `json:"deadline" binding:"required"`
 	IsTaxable bool   `json:"is_taxable" binding:"required"`
 }

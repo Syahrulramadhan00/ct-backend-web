@@ -71,6 +71,7 @@ func PurchaseDI(db *gorm.DB) *Controller.PurchaseController {
 
 func InvoiceDI(db *gorm.DB) *Controller.InvoiceController {
 	panic(wire.Build(wire.NewSet(
+		Repository.ProductRepositoryProvider,
 		Repository.InvoiceRepositoryProvider,
 		Services.InvoiceServiceProvider,
 		Controller.InvoiceControllerProvider,
@@ -78,6 +79,7 @@ func InvoiceDI(db *gorm.DB) *Controller.InvoiceController {
 		wire.Bind(new(Controller.IInvoiceController), new(*Controller.InvoiceController)),
 		wire.Bind(new(Services.IInvoiceService), new(*Services.InvoiceService)),
 		wire.Bind(new(Repository.IInvoiceRepository), new(*Repository.InvoiceRepository)),
+		wire.Bind(new(Repository.IProductRepository), new(*Repository.ProductRepository)),
 	),
 	))
 	return &Controller.InvoiceController{}

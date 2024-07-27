@@ -3,6 +3,7 @@ package main
 import (
 	"ct-backend/Config"
 	"ct-backend/Route"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
@@ -21,6 +22,12 @@ func main() {
 	defer Config.CloseDatabaseConnection(db)
 
 	server := gin.Default()
+
+	server.Use(cors.New(cors.Config{
+		AllowHeaders: []string{"Origin,Content-Type,Accept,User-Agent,Content-Length,Authorization"},
+		AllowOrigins: []string{"http://localhost:3000"},
+		AllowMethods: []string{"GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS"},
+	}))
 
 	if err := godotenv.Load(".env"); err != nil {
 		panic(err)

@@ -52,3 +52,10 @@ func InvoiceDI(db *gorm.DB) *Controller.InvoiceController {
 	invoiceController := Controller.InvoiceControllerProvider(invoiceService)
 	return invoiceController
 }
+
+func ClientDI(db *gorm.DB) *Controller.ClientController {
+	clientRepository := Repository.ClientRepositoryProvider(db)
+	clientService := Services.ClientServiceProvider(clientRepository)
+	clientController := Controller.ClientControllerProvider(clientService)
+	return clientController
+}

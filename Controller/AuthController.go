@@ -49,7 +49,7 @@ func (h *AuthController) Login(ctx *gin.Context) {
 
 	// check verified status
 	if !user.IsVerified {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.JSON(428, gin.H{
 			"message": "user not verified",
 		})
 
@@ -123,7 +123,7 @@ func (h *AuthController) VerifyOtp(ctx *gin.Context) {
 		return
 	}
 
-	err := h.service.VerifyOtp(otpVerificationRequest.Email, otpVerificationRequest.Otp)
+	token, err := h.service.VerifyOtp(otpVerificationRequest.Email, otpVerificationRequest.Otp)
 	if err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{
 			"message": err.Error(),
@@ -134,6 +134,9 @@ func (h *AuthController) VerifyOtp(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "otp verified",
+		"data": gin.H{
+			"token": token,
+		},
 	})
 }
 

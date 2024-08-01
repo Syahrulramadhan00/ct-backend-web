@@ -10,6 +10,12 @@ func InitInvoice(c *gin.RouterGroup, db *gorm.DB) {
 	m := CommonMiddlewareDI()
 
 	c.Use(m.Authentication)
+
+	c.GET("/token-validator", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "token ok",
+		})
+	})
 	c.POST("/add-invoice", r.AddInvoice)
 	c.GET("/get-all-invoice", r.GetAllInvoice)
 	c.GET("/get-invoice/:id", r.GetInvoiceById)

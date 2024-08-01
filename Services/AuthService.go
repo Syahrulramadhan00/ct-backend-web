@@ -17,7 +17,7 @@ type (
 		Login(email string, password string) (user *Model.User, token string, err error)
 		Register(request *Dto.RegisterRequest) (err error)
 		RequestOtp(email string) (err error)
-		VerifyOtp(email string, otp string) (err error)
+		VerifyOtp(email string, otp string) (token string, err error)
 		RequestForgotPasswordOtp(email string) (err error)
 		VerifyForgotPasswordOtp(email string, otp string) (err error)
 		ChangePassword(email string, password string) (err error)
@@ -89,31 +89,35 @@ func (h *AuthService) RequestOtp(email string) (err error) {
 	return err
 }
 
-func (h *AuthService) VerifyOtp(email string, otp string) (err error) {
+func (h *AuthService) VerifyOtp(email string, otp string) (token string, err error) {
 	var (
 		user *Model.User
 	)
 
 	if user, err = h.repo.GetUserInformation(email); err != nil {
-		return err
+		return "", err
 	} else if user == nil {
-		return errors.New("user not found")
+		return "", errors.New("user not found")
 	}
 
 	if user.OtpCode != otp {
-		return errors.New("invalid otp")
+		return "", errors.New("invalid otp")
 	} else {
 
 		if user.UpdatedAt.Before(time.Now().Add(-5 * time.Minute)) {
-			return errors.New("otp expired")
+			return "", errors.New("otp expired")
 		}
 
 		if err = h.repo.SetVerificationStatus(email); err != nil {
-			return err
+			return "", err
 		}
 	}
 
-	return
+	if token, err = h.jwtService.GenerateToken(int(user.ID)); err != nil {
+		return "", err
+	}
+
+	return token, err
 }
 
 func (h *AuthService) RequestForgotPasswordOtp(email string) (err error) {

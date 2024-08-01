@@ -3,6 +3,7 @@ package Repository
 import (
 	"ct-backend/Model"
 	"ct-backend/Model/Dto"
+	"errors"
 	"gorm.io/gorm"
 )
 
@@ -10,6 +11,7 @@ type (
 	IInvoiceRepository interface {
 		GetAll() ([]Model.Invoice, error)
 		GetById(id int) (Model.Invoice, error)
+		GetLast() (*Model.Invoice, error)
 		Create(request *Dto.CreateInvoiceRequest) (err error)
 		Delete(request Dto.IdRequest) (err error)
 		UpdateDocument(request Dto.UpdateDocumentRequest) (err error)
@@ -40,6 +42,18 @@ func (h *InvoiceRepository) GetAll() (invoices []Model.Invoice, err error) {
 	}
 
 	return invoices, nil
+}
+
+func (h *InvoiceRepository) GetLast() (invoice *Model.Invoice, err error) {
+	if err := h.DB.Last(&invoice).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return invoice, nil
 }
 
 func (h *InvoiceRepository) GetById(id int) (invoice Model.Invoice, err error) {

@@ -34,6 +34,7 @@ type ShortInvoice struct {
 	ClientName  string
 	CreatedAt   time.Time
 	Status      string
+	StatusId    int
 }
 
 func (i Invoice) GetStatusName() string {

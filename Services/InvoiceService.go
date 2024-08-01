@@ -4,7 +4,12 @@ import (
 	"ct-backend/Model"
 	"ct-backend/Model/Dto"
 	"ct-backend/Repository"
+	"ct-backend/Utils"
 	"errors"
+	"fmt"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type (
@@ -38,7 +43,15 @@ func InvoiceServiceProvider(invoiceRepository Repository.IInvoiceRepository, Pro
 }
 
 func (h *InvoiceService) AddInvoice(request *Dto.CreateInvoiceRequest) error {
-	// TODO : Add Random Invoice Code
+	invoice, err := h.InvoiceRepository.GetLast()
+	if err != nil {
+		return err
+	}
+
+	request.InvoiceCode, err = createInvoiceCode(invoice)
+	if err != nil {
+		return err
+	}
 
 	return h.InvoiceRepository.Create(request)
 }
@@ -57,6 +70,7 @@ func (h *InvoiceService) GetAllInvoice() ([]Model.ShortInvoice, error) {
 			ClientName:  invoice.Client.Name,
 			CreatedAt:   invoice.CreatedAt,
 			Status:      invoice.GetStatusName(),
+			StatusId:    invoice.InvoiceStatusId,
 		})
 	}
 
@@ -125,4 +139,26 @@ func (h *InvoiceService) DeleteInvoice(request Dto.IdRequest) error {
 
 func (h *InvoiceService) GetAllSale(invoiceId int) ([]Model.Sale, error) {
 	return h.InvoiceRepository.GetAllSale(invoiceId)
+}
+
+func createInvoiceCode(invoice *Model.Invoice) (val string, err error) {
+	month := Utils.MonthToRoman(int(time.Now().Month()))
+	year := time.Now().Year()
+	order := 1
+
+	if invoice != nil {
+		if invoice.CreatedAt.Year() == year {
+			parts := strings.Split(invoice.InvoiceCode, "/")
+			order, err = strconv.Atoi(parts[0])
+
+			if err != nil {
+				fmt.Println("Error converting to integer:", err)
+				return "", err
+			}
+
+			order++
+		}
+	}
+
+	return fmt.Sprintf("%d/%s/CTE276/SBY/%d ", order, month, year-2000), nil
 }

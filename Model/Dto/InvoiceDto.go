@@ -28,10 +28,10 @@ type UpdateSaleRequest struct {
 }
 
 type UpdateFakturRequest struct {
-	InvoiceId int    `json:"invoice_id" binding:"required"`
-	Discount  int    `json:"discount"`
-	Deadline  string `json:"deadline" binding:"required"`
-	IsTaxable bool   `json:"is_taxable" binding:"required"`
+	InvoiceId   int  `json:"invoice_id" binding:"required"`
+	Discount    int  `json:"discount"`
+	PaymentTerm int  `json:"payment_term" binding:"required"`
+	IsTaxable   bool `json:"is_taxable" binding:"required"`
 }
 
 type UpdateMainInformationRequest struct {

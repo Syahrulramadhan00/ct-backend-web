@@ -22,7 +22,7 @@ type Invoice struct {
 	PoPath              string
 	Discount            int
 	IsTaxable           bool
-	Deadline            time.Time
+	PaymentTerm         int
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 	Client              Client `gorm:"foreignKey:ClientId"`

@@ -10,4 +10,5 @@ type Sale struct {
 	Price      int
 	SendStatus bool
 	CreatedAt  time.Time
+	Product    Product `gorm:"foreignKey:ProductId"`
 }

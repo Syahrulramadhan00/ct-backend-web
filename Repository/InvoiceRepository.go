@@ -162,7 +162,7 @@ func (h *InvoiceRepository) UpdateFaktur(request *Dto.UpdateFakturRequest) (err 
 		Where("id = ?", request.InvoiceId).
 		Update("discount", request.Discount).
 		Update("is_taxable", request.IsTaxable).
-		Update("deadline", request.Deadline).Error; err != nil {
+		Update("payment_term", request.PaymentTerm).Error; err != nil {
 		return err
 	}
 
@@ -209,7 +209,7 @@ func (h *InvoiceRepository) UpdateStatus(request *Dto.UpdateStatusRequest) (err 
 }
 
 func (h *InvoiceRepository) GetAllSale(invoiceId int) (sales []Model.Sale, err error) {
-	if err := h.DB.Where("invoice_id = ?", invoiceId).Find(&sales).Error; err != nil {
+	if err := h.DB.Preload("Product").Where("invoice_id = ?", invoiceId).Find(&sales).Error; err != nil {
 		return nil, err
 	}
 

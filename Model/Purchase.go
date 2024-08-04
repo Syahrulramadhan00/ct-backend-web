@@ -10,4 +10,5 @@ type Purchase struct {
 	IsPaid    *bool
 	ImagePath *string
 	CreatedAt time.Time
+	Product   Product `gorm:"foreignKey:ProductId"`
 }

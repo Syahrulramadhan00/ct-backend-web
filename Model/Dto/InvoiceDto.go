@@ -54,3 +54,8 @@ type UpdateStatusRequest struct {
 	InvoiceId       int `json:"invoice_id" binding:"required"`
 	InvoiceStatusId int `json:"invoice_status_id" binding:"required"`
 }
+
+type UpdateNotSentSaleRequest struct {
+	SaleId int `json:"sale_id" binding:"required"`
+	Count  int `json:"count" binding:"required"`
+}

@@ -12,4 +12,5 @@ func Init(c *gin.Engine, db *gorm.DB) {
 	InitPurchase(prefix, db)
 	InitInvoice(prefix, db)
 	InitClient(prefix, db)
+	InitDelivery(prefix, db)
 }

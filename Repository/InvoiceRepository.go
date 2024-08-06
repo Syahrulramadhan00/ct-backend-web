@@ -23,6 +23,8 @@ type (
 		UpdateMainInformation(request *Dto.UpdateMainInformationRequest) (err error)
 		UpdateNote(request *Dto.UpdateNoteRequest) (err error)
 		UpdateStatus(request *Dto.UpdateStatusRequest) (err error)
+		UpdateNotSentSale(request *Dto.UpdateNotSentSaleRequest) (err error)
+		GetSalesByInvoiceId(invoiceId int) ([]Model.Sale, error)
 	}
 
 	InvoiceRepository struct {
@@ -105,11 +107,12 @@ func (h *InvoiceRepository) UpdateDocument(request Dto.UpdateDocumentRequest) (e
 
 func (h *InvoiceRepository) AddSale(request *Dto.AddSaleRequest) (err error) {
 	sale := &Model.Sale{
-		InvoiceId:  request.InvoiceId,
-		ProductId:  request.ProductId,
-		Quantity:   request.Count,
-		Price:      request.Price,
-		SendStatus: false,
+		InvoiceId:    request.InvoiceId,
+		ProductId:    request.ProductId,
+		Quantity:     request.Count,
+		Price:        request.Price,
+		NotSentCount: request.Count,
+		SendStatus:   false,
 	}
 
 	if err := h.DB.Create(&sale).Error; err != nil {
@@ -124,6 +127,7 @@ func (h *InvoiceRepository) UpdateSale(request *Dto.UpdateSaleRequest) (err erro
 		Model(&Model.Sale{}).
 		Where("id = ?", request.Id).
 		Update("quantity", request.Count).
+		Update("not_sent_count", request.Count).
 		Update("price", request.Price).Error; err != nil {
 		return err
 	}
@@ -210,6 +214,25 @@ func (h *InvoiceRepository) UpdateStatus(request *Dto.UpdateStatusRequest) (err 
 
 func (h *InvoiceRepository) GetAllSale(invoiceId int) (sales []Model.Sale, err error) {
 	if err := h.DB.Preload("Product").Where("invoice_id = ?", invoiceId).Find(&sales).Error; err != nil {
+		return nil, err
+	}
+
+	return sales, nil
+}
+
+func (h *InvoiceRepository) UpdateNotSentSale(request *Dto.UpdateNotSentSaleRequest) (err error) {
+	if err := h.DB.
+		Model(&Model.Sale{}).
+		Where("id = ?", request.SaleId).
+		Update("not_sent_count", gorm.Expr("not_sent_count - ?", request.Count)).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *InvoiceRepository) GetSalesByInvoiceId(invoiceId int) (sales []Model.Sale, err error) {
+	if err := h.DB.Where("invoice_id = ?", invoiceId).Find(&sales).Error; err != nil {
 		return nil, err
 	}
 

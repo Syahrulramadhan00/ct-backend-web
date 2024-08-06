@@ -59,3 +59,11 @@ func ClientDI(db *gorm.DB) *Controller.ClientController {
 	clientController := Controller.ClientControllerProvider(clientService)
 	return clientController
 }
+
+func DeliveryDI(db *gorm.DB) *Controller.DeliveryController {
+	deliveryRepository := Repository.DeliveryRepositoryProvider(db)
+	invoiceRepository := Repository.InvoiceRepositoryProvider(db)
+	deliveryService := Services.DeliveryServiceProvider(deliveryRepository, invoiceRepository)
+	deliveryController := Controller.DeliveryControllerProvider(deliveryService)
+	return deliveryController
+}

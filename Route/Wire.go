@@ -98,3 +98,19 @@ func ClientDI(db *gorm.DB) *Controller.ClientController {
 	))
 	return &Controller.ClientController{}
 }
+
+func DeliveryDI(db *gorm.DB) *Controller.DeliveryController {
+	panic(wire.Build(wire.NewSet(
+		Repository.InvoiceRepositoryProvider,
+		Repository.DeliveryRepositoryProvider,
+		Services.DeliveryServiceProvider,
+		Controller.DeliveryControllerProvider,
+
+		wire.Bind(new(Controller.IDeliveryController), new(*Controller.DeliveryController)),
+		wire.Bind(new(Services.IDeliveryService), new(*Services.DeliveryService)),
+		wire.Bind(new(Repository.IDeliveryRepository), new(*Repository.DeliveryRepository)),
+		wire.Bind(new(Repository.IInvoiceRepository), new(*Repository.InvoiceRepository)),
+	),
+	))
+	return &Controller.DeliveryController{}
+}

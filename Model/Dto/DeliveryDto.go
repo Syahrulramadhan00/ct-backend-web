@@ -11,6 +11,7 @@ type (
 		ID              int `json:"id" required:"true"`
 		Quantity        int `json:"quantity" required:"true"`
 		CurrentQuantity int `json:"current_quantity" required:"true"`
+		SaleId          int `json:"sale_id" required:"true"`
 	}
 
 	DeleteDeliveryProductRequest struct {

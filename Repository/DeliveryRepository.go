@@ -33,7 +33,7 @@ func DeliveryRepositoryProvider(DB *gorm.DB) *DeliveryRepository {
 }
 
 func (h *DeliveryRepository) GetById(id int) (delivery *Model.DeliveryOrder, err error) {
-	if err := h.DB.Where("id = ?", id).First(&delivery).Error; err != nil {
+	if err := h.DB.Preload("Invoice.Client").Where("id = ?", id).First(&delivery).Error; err != nil {
 		return nil, err
 	}
 

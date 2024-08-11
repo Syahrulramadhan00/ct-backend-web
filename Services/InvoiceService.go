@@ -160,5 +160,5 @@ func createInvoiceCode(invoice *Model.Invoice) (val string, err error) {
 		}
 	}
 
-	return fmt.Sprintf("%d/%s/CTE276/SBY/%d ", order, month, year-2000), nil
+	return fmt.Sprintf("%d/%s/CTE276/SBY/%d", order, month, year-2000), nil
 }

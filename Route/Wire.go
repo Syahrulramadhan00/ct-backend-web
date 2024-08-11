@@ -114,3 +114,17 @@ func DeliveryDI(db *gorm.DB) *Controller.DeliveryController {
 	))
 	return &Controller.DeliveryController{}
 }
+
+func UserDI(db *gorm.DB) *Controller.UserController {
+	panic(wire.Build(wire.NewSet(
+		Repository.UserRepositoryProvider,
+		Services.UserServiceProvider,
+		Controller.UserControllerProvider,
+
+		wire.Bind(new(Controller.IUserController), new(*Controller.UserController)),
+		wire.Bind(new(Services.IUserService), new(*Services.UserService)),
+		wire.Bind(new(Repository.IUserRepository), new(*Repository.UserRepository)),
+	),
+	))
+	return &Controller.UserController{}
+}

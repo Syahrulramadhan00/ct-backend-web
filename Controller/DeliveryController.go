@@ -20,6 +20,8 @@ type (
 		UpdateMainInformation(ctx *gin.Context)
 		GetPreviousNote(ctx *gin.Context)
 		LockDeliveryOrder(ctx *gin.Context)
+		GetAvailableInvoices(ctx *gin.Context)
+		GetAvailableSales(ctx *gin.Context)
 	}
 
 	DeliveryController struct {
@@ -241,5 +243,43 @@ func (h *DeliveryController) LockDeliveryOrder(ctx *gin.Context) {
 
 	ctx.JSON(200, gin.H{
 		"message": "success",
+	})
+}
+
+func (h *DeliveryController) GetAvailableInvoices(ctx *gin.Context) {
+	invoices, err := h.DeliveryService.GetAvailableInvoices()
+	if err != nil {
+		ctx.JSON(500, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"message": "success",
+		"data":    invoices,
+	})
+}
+
+func (h *DeliveryController) GetAvailableSales(ctx *gin.Context) {
+	invoiceId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(400, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	sales, err := h.DeliveryService.GetAvailableSales(invoiceId)
+	if err != nil {
+		ctx.JSON(500, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"message": "success",
+		"data":    sales,
 	})
 }

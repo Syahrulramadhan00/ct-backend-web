@@ -22,4 +22,6 @@ func InitDelivery(c *gin.RouterGroup, db *gorm.DB) {
 	c.PUT("/update-delivery-information", r.UpdateMainInformation)
 	c.GET("/get-previous-note/:id", r.GetPreviousNote)
 	c.PUT("/lock-delivery-order", r.LockDeliveryOrder)
+	c.GET("/delivery/get-available-invoices", r.GetAvailableInvoices)
+	c.GET("/delivery/get-available-sales/:id", r.GetAvailableSales)
 }

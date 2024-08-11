@@ -25,6 +25,7 @@ type (
 		UpdateStatus(request *Dto.UpdateStatusRequest) (err error)
 		UpdateNotSentSale(request *Dto.UpdateNotSentSaleRequest) (err error)
 		GetSalesByInvoiceId(invoiceId int) ([]Model.Sale, error)
+		GetAllForDelivery() ([]Model.Invoice, error)
 	}
 
 	InvoiceRepository struct {
@@ -232,9 +233,20 @@ func (h *InvoiceRepository) UpdateNotSentSale(request *Dto.UpdateNotSentSaleRequ
 }
 
 func (h *InvoiceRepository) GetSalesByInvoiceId(invoiceId int) (sales []Model.Sale, err error) {
-	if err := h.DB.Where("invoice_id = ?", invoiceId).Find(&sales).Error; err != nil {
+	if err := h.DB.Preload("Product").Where("invoice_id = ?", invoiceId).Find(&sales).Error; err != nil {
 		return nil, err
 	}
 
 	return sales, nil
+}
+
+func (h *InvoiceRepository) GetAllForDelivery() (invoices []Model.Invoice, err error) {
+	if err := h.DB.Preload("Client").
+		Joins("JOIN sales ON sales.invoice_id = invoices.id").
+		Where("invoice_status_id = 2 AND sales.not_sent_count > 0").
+		Find(&invoices).Error; err != nil {
+		return nil, err
+	}
+
+	return invoices, nil
 }

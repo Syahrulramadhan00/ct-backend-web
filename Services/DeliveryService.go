@@ -4,7 +4,6 @@ import (
 	"ct-backend/Model"
 	"ct-backend/Model/Dto"
 	"ct-backend/Repository"
-	"strconv"
 )
 
 type (
@@ -20,6 +19,8 @@ type (
 		UpdateMainInformation(request *Dto.UpdateDeliveryInformationRequest) (err error)
 		GetPreviousNote(id int) (note string, err error)
 		LockDeliveryOrder(request *Dto.LockDeliveryOrderRequest) (err error)
+		GetAvailableInvoices() (invoices []Model.ShortInvoice, err error)
+		GetAvailableSales(invoiceId int) (sales []Model.Sale, err error)
 	}
 
 	DeliveryService struct {
@@ -52,6 +53,7 @@ func (h *DeliveryService) GetAll() (deliveries []Model.ShortDeliveryOrder, err e
 			ClientName: data.Invoice.Client.Name,
 			CreatedAt:  data.CreatedAt,
 			Status:     data.GetStatusName(),
+			StatusId:   data.Status,
 		})
 	}
 
@@ -91,7 +93,7 @@ func (h *DeliveryService) UpdateDeliveryProduct(request *Dto.UpdateDeliveryProdu
 		return err
 	}
 
-	if err = h.InvoiceRepo.UpdateNotSentSale(&Dto.UpdateNotSentSaleRequest{SaleId: request.ID, Count: request.Quantity - request.CurrentQuantity}); err != nil {
+	if err = h.InvoiceRepo.UpdateNotSentSale(&Dto.UpdateNotSentSaleRequest{SaleId: request.SaleId, Count: request.Quantity - request.CurrentQuantity}); err != nil {
 		return err
 	}
 
@@ -121,6 +123,7 @@ func (h *DeliveryService) GetAllDeliveryProduct(request *Dto.IdRequest) (deliver
 			ID:       data.ID,
 			Name:     data.Sale.Product.Name,
 			Quantity: data.Quantity,
+			SaleID:   data.SalesID,
 		})
 	}
 
@@ -212,9 +215,43 @@ func (h *DeliveryService) LockDeliveryOrder(request *Dto.LockDeliveryOrderReques
 	return nil
 }
 
-func generateOrderCode(invoiceCode string, deliveriesCount int) (val string) {
-	ascii := 61 + deliveriesCount
+func (h *DeliveryService) GetAvailableInvoices() (invoices []Model.ShortInvoice, err error) {
+	rawData, err := h.InvoiceRepo.GetAllForDelivery()
+	if err != nil {
+		return nil, err
+	}
 
-	val = invoiceCode + "/" + strconv.Itoa(ascii)
+	for _, data := range rawData {
+		invoices = append(invoices, Model.ShortInvoice{
+			ID:          data.ID,
+			InvoiceCode: data.InvoiceCode,
+			ClientName:  data.Client.Name,
+			CreatedAt:   data.CreatedAt,
+			Status:      data.GetStatusName(),
+		})
+	}
+
+	return invoices, nil
+}
+
+func generateOrderCode(invoiceCode string, deliveriesCount int) (val string) {
+	ascii := 97 + deliveriesCount
+
+	val = invoiceCode + "/" + string(rune(ascii))
 	return val
+}
+
+func (h *DeliveryService) GetAvailableSales(invoiceId int) (sales []Model.Sale, err error) {
+	if sales, err = h.InvoiceRepo.GetSalesByInvoiceId(invoiceId); err != nil {
+		return nil, err
+	}
+
+	var availableSales []Model.Sale
+	for _, sale := range sales {
+		if sale.NotSentCount > 0 {
+			availableSales = append(availableSales, sale)
+		}
+	}
+
+	return availableSales, nil
 }

@@ -21,6 +21,7 @@ type ShortDeliveryOrder struct {
 	ClientName string
 	CreatedAt  time.Time
 	Status     string
+	StatusId   int
 }
 
 func (d DeliveryOrder) GetStatusName() string {

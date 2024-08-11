@@ -67,3 +67,10 @@ func DeliveryDI(db *gorm.DB) *Controller.DeliveryController {
 	deliveryController := Controller.DeliveryControllerProvider(deliveryService)
 	return deliveryController
 }
+
+func UserDI(db *gorm.DB) *Controller.UserController {
+	userRepository := Repository.UserRepositoryProvider(db)
+	userService := Services.UserServiceProvider(userRepository)
+	userController := Controller.UserControllerProvider(userService)
+	return userController
+}

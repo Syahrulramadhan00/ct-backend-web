@@ -1,16 +1,11 @@
 package Utils
 
 import (
-	"github.com/joho/godotenv"
 	"net/smtp"
 	"os"
 )
 
 func SendEmailToAdmin(subject string, message string) error {
-	if err := godotenv.Load(".env"); err != nil {
-		return err
-	}
-
 	msg := []byte("To: mahendrakrs448@gmail.com\r\n" + "Subject:" + subject + "\r\n" + "\r\n" + message + "\r\n")
 
 	auth := smtp.PlainAuth(
@@ -33,10 +28,6 @@ func SendEmailToAdmin(subject string, message string) error {
 }
 
 func SendEmail(to string, subject string, message string) error {
-	if err := godotenv.Load(".env"); err != nil {
-		return err
-	}
-
 	msg := []byte("To:" + to + "\r\n" + "Subject:" + subject + "\r\n" + "\r\n" + message + "\r\n")
 
 	auth := smtp.PlainAuth(

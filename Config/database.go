@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
 	"os"
 )
 
@@ -13,7 +14,7 @@ func SetUpDatabaseConnection() *gorm.DB {
 	if os.Getenv("APP_ENV") != Constants.ENUM_RUN_PRODUCTION {
 		err := godotenv.Load(".env")
 		if err != nil {
-			panic(err)
+			log.Printf("error loading .env file: %v", err)
 		}
 	}
 

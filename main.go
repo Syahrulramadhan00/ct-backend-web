@@ -25,12 +25,12 @@ func main() {
 
 	server.Use(cors.New(cors.Config{
 		AllowHeaders: []string{"Origin,Content-Type,Accept,User-Agent,Content-Length,Authorization"},
-		AllowOrigins: []string{"http://localhost:3000"},
+		AllowOrigins: []string{"*"},
 		AllowMethods: []string{"GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS"},
 	}))
 
 	if err := godotenv.Load(".env"); err != nil {
-		panic(err)
+		log.Printf("error loading .env file: %v", err)
 	}
 
 	port := os.Getenv("PORT")

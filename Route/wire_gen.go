@@ -77,7 +77,8 @@ func UserDI(db *gorm.DB) *Controller.UserController {
 
 func ReceiptDI(db *gorm.DB) *Controller.ReceiptController {
 	receiptRepository := Repository.ReceiptRepositoryProvider(db)
-	receiptService := Services.ReceiptServiceProvider(receiptRepository)
+	invoiceRepository := Repository.InvoiceRepositoryProvider(db)
+	receiptService := Services.ReceiptServiceProvider(receiptRepository, invoiceRepository)
 	receiptController := Controller.ReceiptControllerProvider(receiptService)
 	return receiptController
 }

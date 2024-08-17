@@ -17,4 +17,6 @@ func InitReceipt(c *gin.RouterGroup, db *gorm.DB) {
 	c.POST("/add-invoice-to-receipt", r.AddInvoiceToReceipt)
 	c.POST("/lock-receipt", r.LockReceipt)
 	c.DELETE("/delete-invoice-receipt/:id", r.DeleteReceiptInvoice)
+	c.GET("/get-receipt-invoices/:id", r.GetAvailableInvoices)
+	c.GET("/get-client-receipts", r.GetClientReceipts)
 }

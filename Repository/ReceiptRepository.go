@@ -79,15 +79,46 @@ func (h *ReceiptRepository) AddInvoiceReceipt(receiptInvoice *Dto.ReceiptInvoice
 		InvoiceId: receiptInvoice.InvoiceId,
 	}
 
-	if err := h.DB.Create(&receiptInvoiceModel).Error; err != nil {
-		return receiptInvoiceModel, err
+	err := h.DB.Transaction(func(tx *gorm.DB) error {
+
+		if err := tx.Create(&receiptInvoiceModel).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Model(&Model.Invoice{}).Where("id = ?", receiptInvoice.InvoiceId).Update("invoice_status_id", 6).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
 	return receiptInvoiceModel, nil
 }
 
 func (h *ReceiptRepository) DeleteInvoiceReceipt(id int) error {
-	if err := h.DB.Where("id = ?", id).Delete(&Model.ReceiptInvoice{}).Error; err != nil {
+	var receiptInvoices *Model.ReceiptInvoice
+
+	err := h.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("id = ?", id).First(&receiptInvoices).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Delete(&receiptInvoices).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Model(&Model.Invoice{}).Where("id = ?", receiptInvoices.InvoiceId).Update("invoice_status_id", 5).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return err
 	}
 
@@ -95,27 +126,7 @@ func (h *ReceiptRepository) DeleteInvoiceReceipt(id int) error {
 }
 
 func (h *ReceiptRepository) LockReceipt(receiptId int) error {
-	err := h.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Model(&Model.Receipt{}).Where("id = ?", receiptId).Update("status", 2).Error; err != nil {
-			return err
-		}
-
-		var receiptInvoices []Model.ReceiptInvoice
-		err := h.DB.Preload("Invoice").Where("receipt_id = ?", receiptId).Find(&receiptInvoices).Error
-		if err != nil {
-			return err
-		}
-
-		for _, receiptInvoice := range receiptInvoices {
-			if err := tx.Model(&Model.Invoice{}).Where("id = ?", receiptInvoice.InvoiceId).Update("invoice_status_id", 6).Error; err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
-
-	if err != nil {
+	if err := h.DB.Model(&Model.Receipt{}).Where("id = ?", receiptId).Update("status", 2).Error; err != nil {
 		return err
 	}
 

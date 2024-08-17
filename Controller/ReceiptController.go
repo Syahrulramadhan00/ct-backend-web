@@ -17,6 +17,8 @@ type (
 		AddInvoiceToReceipt(ctx *gin.Context)
 		LockReceipt(ctx *gin.Context)
 		DeleteReceiptInvoice(ctx *gin.Context)
+		GetAvailableInvoices(ctx *gin.Context)
+		GetClientReceipts(ctx *gin.Context)
 	}
 
 	ReceiptController struct {
@@ -185,5 +187,41 @@ func (h *ReceiptController) DeleteReceiptInvoice(ctx *gin.Context) {
 
 	ctx.JSON(200, gin.H{
 		"message": "success",
+	})
+}
+
+func (h *ReceiptController) GetAvailableInvoices(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+
+	invoices, err := h.service.GetAvailableInvoices(id)
+
+	if err != nil {
+		ctx.JSON(500, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"message": "success",
+		"data":    invoices,
+	})
+}
+
+func (h *ReceiptController) GetClientReceipts(ctx *gin.Context) {
+	clientReceipts, err := h.service.GetClientReceipts()
+
+	if err != nil {
+		ctx.JSON(500, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"message": "success",
+		"data":    clientReceipts,
 	})
 }

@@ -16,16 +16,20 @@ type (
 		AddInvoiceReceipt(receiptInvoice *Dto.ReceiptInvoiceRequest) (*Model.ReceiptInvoice, error)
 		LockReceipt(receiptId int) error
 		DeleteReceiptInvoice(id int) error
+		GetAvailableInvoices(clientId int) ([]Model.Invoice, error)
+		GetClientReceipts() ([]Model.Client, error)
 	}
 
 	ReceiptService struct {
 		ReceiptRepository Repository.IReceiptRepository
+		InvoiceRepository Repository.IInvoiceRepository
 	}
 )
 
-func ReceiptServiceProvider(receiptRepository Repository.IReceiptRepository) *ReceiptService {
+func ReceiptServiceProvider(receiptRepository Repository.IReceiptRepository, invoiceRepository Repository.IInvoiceRepository) *ReceiptService {
 	return &ReceiptService{
 		ReceiptRepository: receiptRepository,
+		InvoiceRepository: invoiceRepository,
 	}
 }
 
@@ -68,4 +72,39 @@ func (h *ReceiptService) LockReceipt(receiptId int) error {
 
 func (h *ReceiptService) DeleteReceiptInvoice(id int) error {
 	return h.ReceiptRepository.DeleteInvoiceReceipt(id)
+}
+
+func (h *ReceiptService) GetAvailableInvoices(clientId int) ([]Model.Invoice, error) {
+	allInvoices, err := h.InvoiceRepository.GetAllForReceipt()
+	if err != nil {
+		return nil, err
+	}
+
+	var filteredInvoices []Model.Invoice
+	for _, invoice := range allInvoices {
+		if invoice.Client.ID == clientId {
+			filteredInvoices = append(filteredInvoices, invoice)
+		}
+	}
+
+	return filteredInvoices, nil
+}
+
+func (h *ReceiptService) GetClientReceipts() ([]Model.Client, error) {
+	invoices, err := h.InvoiceRepository.GetAllForReceipt()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var uniqueClients []Model.Client
+	clientMap := make(map[int]bool)
+
+	for _, invoice := range invoices {
+		if _, exists := clientMap[invoice.Client.ID]; !exists {
+			clientMap[invoice.Client.ID] = true
+			uniqueClients = append(uniqueClients, invoice.Client)
+		}
+	}
+	return uniqueClients, nil
 }

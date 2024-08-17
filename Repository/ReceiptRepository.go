@@ -1,0 +1,123 @@
+package Repository
+
+import (
+	"ct-backend/Model"
+	"ct-backend/Model/Dto"
+	"gorm.io/gorm"
+)
+
+type (
+	IReceiptRepository interface {
+		GetReceipts() ([]Model.Receipt, error)
+		GetReceiptById(id int) (*Model.Receipt, error)
+		CreateReceipt(receipt *Model.Receipt) (*Model.Receipt, error)
+		GetLast() (*Model.Receipt, error)
+		GetInvoiceByReceiptId(id int) ([]Model.ReceiptInvoice, error)
+		AddInvoiceReceipt(receiptInvoice *Dto.ReceiptInvoiceRequest) (*Model.ReceiptInvoice, error)
+		DeleteInvoiceReceipt(id int) error
+		LockReceipt(receiptId int) error
+	}
+
+	ReceiptRepository struct {
+		DB *gorm.DB
+	}
+)
+
+func ReceiptRepositoryProvider(DB *gorm.DB) *ReceiptRepository {
+	return &ReceiptRepository{
+		DB: DB,
+	}
+}
+
+func (h *ReceiptRepository) GetReceipts() ([]Model.Receipt, error) {
+	var receipts []Model.Receipt
+	if err := h.DB.Preload("Client").Find(&receipts).Error; err != nil {
+		return nil, err
+	}
+
+	return receipts, nil
+}
+
+func (h *ReceiptRepository) GetReceiptById(id int) (*Model.Receipt, error) {
+	var receipt *Model.Receipt
+	if err := h.DB.Preload("Client").Where("id = ?", id).First(&receipt).Error; err != nil {
+		return receipt, err
+	}
+
+	return receipt, nil
+}
+
+func (h *ReceiptRepository) CreateReceipt(receipt *Model.Receipt) (*Model.Receipt, error) {
+	if err := h.DB.Create(&receipt).Error; err != nil {
+		return receipt, err
+	}
+
+	return receipt, nil
+}
+
+func (h *ReceiptRepository) GetLast() (*Model.Receipt, error) {
+	var receipt *Model.Receipt
+	if err := h.DB.Last(&receipt).Error; err != nil {
+		return receipt, err
+	}
+
+	return receipt, nil
+}
+
+func (h *ReceiptRepository) GetInvoiceByReceiptId(id int) ([]Model.ReceiptInvoice, error) {
+	var receiptInvoices []Model.ReceiptInvoice
+	if err := h.DB.Preload("Invoice").Where("receipt_id = ?", id).Find(&receiptInvoices).Error; err != nil {
+		return nil, err
+	}
+
+	return receiptInvoices, nil
+}
+
+func (h *ReceiptRepository) AddInvoiceReceipt(receiptInvoice *Dto.ReceiptInvoiceRequest) (*Model.ReceiptInvoice, error) {
+	receiptInvoiceModel := &Model.ReceiptInvoice{
+		ReceiptId: receiptInvoice.ReceiptId,
+		InvoiceId: receiptInvoice.InvoiceId,
+	}
+
+	if err := h.DB.Create(&receiptInvoiceModel).Error; err != nil {
+		return receiptInvoiceModel, err
+	}
+
+	return receiptInvoiceModel, nil
+}
+
+func (h *ReceiptRepository) DeleteInvoiceReceipt(id int) error {
+	if err := h.DB.Where("id = ?", id).Delete(&Model.ReceiptInvoice{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *ReceiptRepository) LockReceipt(receiptId int) error {
+	err := h.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Model(&Model.Receipt{}).Where("id = ?", receiptId).Update("status", 2).Error; err != nil {
+			return err
+		}
+
+		var receiptInvoices []Model.ReceiptInvoice
+		err := h.DB.Preload("Invoice").Where("receipt_id = ?", receiptId).Find(&receiptInvoices).Error
+		if err != nil {
+			return err
+		}
+
+		for _, receiptInvoice := range receiptInvoices {
+			if err := tx.Model(&Model.Invoice{}).Where("id = ?", receiptInvoice.InvoiceId).Update("invoice_status_id", 6).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

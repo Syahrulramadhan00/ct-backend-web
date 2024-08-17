@@ -14,4 +14,5 @@ func Init(c *gin.Engine, db *gorm.DB) {
 	InitClient(prefix, db)
 	InitDelivery(prefix, db)
 	InitUser(prefix, db)
+	InitReceipt(prefix, db)
 }

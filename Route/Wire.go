@@ -128,3 +128,17 @@ func UserDI(db *gorm.DB) *Controller.UserController {
 	))
 	return &Controller.UserController{}
 }
+
+func ReceiptDI(db *gorm.DB) *Controller.ReceiptController {
+	panic(wire.Build(wire.NewSet(
+		Repository.ReceiptRepositoryProvider,
+		Services.ReceiptServiceProvider,
+		Controller.ReceiptControllerProvider,
+
+		wire.Bind(new(Controller.IReceiptController), new(*Controller.ReceiptController)),
+		wire.Bind(new(Services.IReceiptService), new(*Services.ReceiptService)),
+		wire.Bind(new(Repository.IReceiptRepository), new(*Repository.ReceiptRepository)),
+	),
+	))
+	return &Controller.ReceiptController{}
+}

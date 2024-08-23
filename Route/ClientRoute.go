@@ -12,4 +12,6 @@ func InitClient(c *gin.RouterGroup, db *gorm.DB) {
 	c.Use(m.Authentication)
 
 	c.GET("/get-all-client", r.GetAllClient)
+	c.POST("/create-client", r.CreateClient)
+	c.PUT("/update-client", r.UpdateClient)
 }

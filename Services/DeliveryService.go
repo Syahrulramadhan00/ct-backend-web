@@ -4,12 +4,13 @@ import (
 	"ct-backend/Model"
 	"ct-backend/Model/Dto"
 	"ct-backend/Repository"
+	"github.com/gin-gonic/gin"
 )
 
 type (
 	IDeliveryService interface {
 		GetById(id int) (delivery *Model.DeliveryOrder, err error)
-		GetAll() (deliveries []Model.ShortDeliveryOrder, err error)
+		GetAll(ctx *gin.Context) (deliveries []Model.ShortDeliveryOrder, err error)
 		CreateDeliveryOrder(request *Dto.IdRequest) (err error)
 		CreateDeliveryProduct(request *Dto.CreateDeliveryProductRequest) (err error)
 		UpdateDeliveryProduct(request *Dto.UpdateDeliveryProductRequest) (err error)
@@ -40,8 +41,8 @@ func (h *DeliveryService) GetById(id int) (delivery *Model.DeliveryOrder, err er
 	return h.Repo.GetById(id)
 }
 
-func (h *DeliveryService) GetAll() (deliveries []Model.ShortDeliveryOrder, err error) {
-	rawData, err := h.Repo.GetAll()
+func (h *DeliveryService) GetAll(ctx *gin.Context) (deliveries []Model.ShortDeliveryOrder, err error) {
+	rawData, err := h.Repo.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}

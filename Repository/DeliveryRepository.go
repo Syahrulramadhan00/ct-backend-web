@@ -3,13 +3,15 @@ package Repository
 import (
 	"ct-backend/Model"
 	"ct-backend/Model/Dto"
+	"ct-backend/Utils"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type (
 	IDeliveryRepository interface {
 		GetById(id int) (delivery *Model.DeliveryOrder, err error)
-		GetAll() (deliveries []Model.DeliveryOrder, err error)
+		GetAll(ctx *gin.Context) (deliveries []Model.DeliveryOrder, err error)
 		CreateDeliveryOrder(request *Dto.IdRequest, orderCode string) (err error)
 		CreateDeliveryProduct(request *Dto.CreateDeliveryProductRequest) (err error)
 		UpdateDeliveryProduct(request *Dto.UpdateDeliveryProductRequest) (err error)
@@ -40,8 +42,8 @@ func (h *DeliveryRepository) GetById(id int) (delivery *Model.DeliveryOrder, err
 	return delivery, nil
 }
 
-func (h *DeliveryRepository) GetAll() (deliveries []Model.DeliveryOrder, err error) {
-	if err := h.DB.Preload("Invoice.Client").Find(&deliveries).Error; err != nil {
+func (h *DeliveryRepository) GetAll(ctx *gin.Context) (deliveries []Model.DeliveryOrder, err error) {
+	if err := h.DB.Debug().Preload("Invoice.Client").Where("order_code LIKE ?", "%"+ctx.Query("order_code")+"%").Scopes(Utils.Paginate(ctx)).Find(&deliveries).Error; err != nil {
 		return nil, err
 	}
 

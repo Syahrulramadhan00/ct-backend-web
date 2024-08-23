@@ -1,6 +1,7 @@
 package Controller
 
 import (
+	"ct-backend/Model/Common"
 	"ct-backend/Model/Dto"
 	"ct-backend/Services"
 	"github.com/gin-gonic/gin"
@@ -52,7 +53,7 @@ func (h *DeliveryController) GetById(ctx *gin.Context) {
 }
 
 func (h *DeliveryController) GetAll(ctx *gin.Context) {
-	deliveries, err := h.DeliveryService.GetAll()
+	deliveries, err := h.DeliveryService.GetAll(ctx)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"message": err.Error(),
@@ -60,9 +61,16 @@ func (h *DeliveryController) GetAll(ctx *gin.Context) {
 		return
 	}
 
+	pagination := Common.Pagination{
+		Total: ctx.GetInt("total_pages"),
+		Limit: ctx.GetInt("page_size"),
+		Page:  ctx.GetInt("page"),
+	}
+
 	ctx.JSON(200, gin.H{
 		"message": "success",
 		"data":    deliveries,
+		"info":    pagination,
 	})
 }
 

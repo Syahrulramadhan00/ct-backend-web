@@ -1,6 +1,7 @@
 package Controller
 
 import (
+	"ct-backend/Model"
 	"ct-backend/Model/Common"
 	"ct-backend/Model/Dto"
 	"ct-backend/Services"
@@ -59,6 +60,10 @@ func (h *DeliveryController) GetAll(ctx *gin.Context) {
 			"message": err.Error(),
 		})
 		return
+	}
+
+	if deliveries == nil {
+		deliveries = []Model.ShortDeliveryOrder{}
 	}
 
 	pagination := Common.Pagination{

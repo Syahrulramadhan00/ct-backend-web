@@ -222,7 +222,13 @@ func (h *DeliveryService) GetAvailableInvoices() (invoices []Model.ShortInvoice,
 		return nil, err
 	}
 
+	seenIDs := make(map[int]struct{})
 	for _, data := range rawData {
+		if _, exists := seenIDs[data.ID]; exists {
+			continue
+		}
+		seenIDs[data.ID] = struct{}{}
+
 		invoices = append(invoices, Model.ShortInvoice{
 			ID:          data.ID,
 			InvoiceCode: data.InvoiceCode,

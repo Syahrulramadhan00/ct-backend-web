@@ -70,7 +70,7 @@ func (h *DeliveryController) GetAll(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{
 		"message": "success",
 		"data":    deliveries,
-		"info":    pagination,
+		"meta":    pagination,
 	})
 }
 

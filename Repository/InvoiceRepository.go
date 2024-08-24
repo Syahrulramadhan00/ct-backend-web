@@ -186,6 +186,8 @@ func (h *InvoiceRepository) UpdateMainInformation(request *Dto.UpdateMainInforma
 		Update("platform", request.Platform).
 		Update("payment_method", request.PaymentMethod).
 		Update("platform_description", request.PlatformDescription).
+		Update("project_name", request.Project).
+		Update("date", request.Date).
 		Update("platform_number", request.PlatformNumber).Error; err != nil {
 		return err
 	}

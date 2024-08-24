@@ -24,6 +24,8 @@ type Invoice struct {
 	IsTaxable           bool
 	PaymentTerm         int
 	TotalPrice          int
+	ProjectName         string
+	Date                time.Time
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 	Client              Client `gorm:"foreignKey:ClientId"`

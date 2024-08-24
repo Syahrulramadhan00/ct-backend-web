@@ -43,6 +43,8 @@ type UpdateMainInformationRequest struct {
 	PaymentMethod       string `json:"payment_method" binding:"required"`
 	PlatformDescription string `json:"platform_description" binding:"required"`
 	PlatformNumber      string `json:"platform_number" binding:"required"`
+	Project             string `json:"project" binding:"required"`
+	Date                string `json:"date"`
 }
 
 type UpdateNoteRequest struct {

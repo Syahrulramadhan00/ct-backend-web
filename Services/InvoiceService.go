@@ -82,6 +82,11 @@ func (h *InvoiceService) GetInvoiceById(id int) (Model.Invoice, error) {
 }
 
 func (h *InvoiceService) LockInvoice(request *Dto.IdRequest) error {
+	err := h.InvoiceRepository.UpdateInvoiceTotalPrice(request.Id)
+	if err != nil {
+		return err
+	}
+
 	return h.InvoiceRepository.UpdateStatus(&Dto.UpdateStatusRequest{InvoiceId: request.Id, InvoiceStatusId: 2})
 }
 

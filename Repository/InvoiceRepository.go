@@ -27,6 +27,7 @@ type (
 		GetSalesByInvoiceId(invoiceId int) ([]Model.Sale, error)
 		GetAllForDelivery() ([]Model.Invoice, error)
 		GetAllForReceipt() ([]Model.Invoice, error)
+		UpdateInvoiceTotalPrice(invoiceID int) error
 	}
 
 	InvoiceRepository struct {
@@ -258,4 +259,25 @@ func (h *InvoiceRepository) GetAllForReceipt() (invoices []Model.Invoice, err er
 	}
 
 	return invoices, nil
+}
+
+func (h *InvoiceRepository) UpdateInvoiceTotalPrice(invoiceID int) error {
+	var total float64
+
+	err := h.DB.Model(&Model.Sale{}).
+		Where("invoice_id = ?", invoiceID).
+		Select("SUM(price * quantity) as total").
+		Scan(&total).Error
+	if err != nil {
+		return err
+	}
+
+	err = h.DB.Model(&Model.Invoice{}).
+		Where("id = ?", invoiceID).
+		Update("total_price", total).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

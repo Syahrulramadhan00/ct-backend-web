@@ -23,6 +23,7 @@ type Invoice struct {
 	Discount            int
 	IsTaxable           bool
 	PaymentTerm         int
+	TotalPrice          int
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 	Client              Client `gorm:"foreignKey:ClientId"`

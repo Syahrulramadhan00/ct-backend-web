@@ -361,6 +361,11 @@ func (h *InvoiceController) UpdatePoFile(ctx *gin.Context) {
 		} else {
 			FileObj.Data = FileObj.File.Filename
 		}
+
+		err = h.InvoiceService.UpdateStatus(&Dto.UpdateStatusRequest{
+			InvoiceId:       invoiceId,
+			InvoiceStatusId: 2,
+		})
 	}
 
 	if err = h.StorageService.UploadFile(&Model.S3ObjectRequest{
@@ -439,6 +444,21 @@ func (h *InvoiceController) UpdateFakturFile(ctx *gin.Context) {
 			return
 		} else {
 			FileObj.Data = FileObj.File.Filename
+		}
+
+		invoice, err := h.InvoiceService.GetInvoiceById(invoiceId)
+		if err != nil {
+			ctx.JSON(http.StatusBadGateway, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		if invoice.InvoiceStatusId < 5 {
+			err = h.InvoiceService.UpdateStatus(&Dto.UpdateStatusRequest{
+				InvoiceId:       invoiceId,
+				InvoiceStatusId: 5,
+			})
 		}
 	}
 

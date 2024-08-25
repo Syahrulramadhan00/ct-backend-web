@@ -247,7 +247,7 @@ func (h *InvoiceRepository) GetSalesByInvoiceId(invoiceId int) (sales []Model.Sa
 func (h *InvoiceRepository) GetAllForDelivery() (invoices []Model.Invoice, err error) {
 	if err := h.DB.Preload("Client").
 		Joins("JOIN sales ON sales.invoice_id = invoices.id").
-		Where("invoice_status_id = 2 AND sales.not_sent_count > 0").
+		Where("invoice_status_id = 3 AND sales.not_sent_count > 0").
 		Find(&invoices).Error; err != nil {
 		return nil, err
 	}
@@ -256,7 +256,7 @@ func (h *InvoiceRepository) GetAllForDelivery() (invoices []Model.Invoice, err e
 }
 
 func (h *InvoiceRepository) GetAllForReceipt() (invoices []Model.Invoice, err error) {
-	if err := h.DB.Preload("Client").Where("invoice_status_id > ? AND invoice_status_id < ?", 2, 6).Find(&invoices).Error; err != nil {
+	if err := h.DB.Preload("Client").Where("invoice_status_id > ? AND invoice_status_id < ?", 3, 6).Find(&invoices).Error; err != nil {
 		return nil, err
 	}
 

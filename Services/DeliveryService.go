@@ -169,7 +169,7 @@ func (h *DeliveryService) GetPreviousNote(id int) (note string, err error) {
 }
 
 func (h *DeliveryService) LockDeliveryOrder(request *Dto.LockDeliveryOrderRequest) (err error) {
-	invoiceStatus := 2
+	invoiceStatus := 3
 
 	sales, err := h.InvoiceRepo.GetSalesByInvoiceId(request.InvoiceId)
 	if err != nil {
@@ -191,18 +191,9 @@ func (h *DeliveryService) LockDeliveryOrder(request *Dto.LockDeliveryOrderReques
 
 	if notSentEmpty {
 		invoiceStatus++
-	}
-
-	if *invoice.PoPath != "-" && *invoice.PoPath != "" {
-		invoiceStatus++
-	}
-
-	if invoice.IsTaxable {
-		if invoice.PoCode != "" && invoice.PoCode != "-" {
+		if !invoice.IsTaxable {
 			invoiceStatus++
 		}
-	} else {
-		invoiceStatus++
 	}
 
 	if err = h.InvoiceRepo.UpdateStatus(&Dto.UpdateStatusRequest{InvoiceId: request.InvoiceId, InvoiceStatusId: invoiceStatus}); err != nil {

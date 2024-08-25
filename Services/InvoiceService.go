@@ -87,7 +87,7 @@ func (h *InvoiceService) LockInvoice(request *Dto.IdRequest) error {
 		return err
 	}
 
-	return h.InvoiceRepository.UpdateStatus(&Dto.UpdateStatusRequest{InvoiceId: request.Id, InvoiceStatusId: 2})
+	return h.InvoiceRepository.UpdateStatus(&Dto.UpdateStatusRequest{InvoiceId: request.Id, InvoiceStatusId: 3})
 }
 
 func (h *InvoiceService) AddSaleToInvoice(request *Dto.AddSaleRequest) error {

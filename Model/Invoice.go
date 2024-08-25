@@ -45,11 +45,11 @@ func (i Invoice) GetStatusName() string {
 	case 1:
 		return "initialized"
 	case 2:
-		return "finalized"
-	case 3:
-		return "sended"
-	case 4:
 		return "preorder_created"
+	case 3:
+		return "finalized"
+	case 4:
+		return "sended"
 	case 5:
 		return "faktur_created"
 	case 6:

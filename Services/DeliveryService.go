@@ -193,7 +193,7 @@ func (h *DeliveryService) LockDeliveryOrder(request *Dto.LockDeliveryOrderReques
 		invoiceStatus++
 	}
 
-	if invoice.PoPath != "-" && invoice.PoPath != "" {
+	if *invoice.PoPath != "-" && *invoice.PoPath != "" {
 		invoiceStatus++
 	}
 

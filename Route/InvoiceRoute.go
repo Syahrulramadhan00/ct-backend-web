@@ -1,12 +1,13 @@
 package Route
 
 import (
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func InitInvoice(c *gin.RouterGroup, db *gorm.DB) {
-	r := InvoiceDI(db)
+func InitInvoice(c *gin.RouterGroup, db *gorm.DB, svc *s3.Client) {
+	r := InvoiceDI(db, svc)
 	m := CommonMiddlewareDI()
 
 	c.Use(m.Authentication)
@@ -29,4 +30,8 @@ func InitInvoice(c *gin.RouterGroup, db *gorm.DB) {
 	c.PUT("/update-status", r.UpdateStatus)
 	c.GET("/get-all-sale/:invoiceId", r.GetAllSale)
 	c.DELETE("/delete-invoice", r.DeleteInvoice)
+	c.POST("/update-po-file/:invoiceId", r.UpdatePoFile)
+	c.POST("/get-po-url", r.GetPoUrl)
+	c.POST("/update-faktur-file/:invoiceId", r.UpdateFakturFile)
+	c.POST("/get-faktur-url", r.GetFakturUrl)
 }

@@ -61,3 +61,7 @@ type UpdateNotSentSaleRequest struct {
 	SaleId int `json:"sale_id" binding:"required"`
 	Count  int `json:"count" binding:"required"`
 }
+
+type GetDocumentUrlRequest struct {
+	Key string `json:"key" binding:"required"`
+}

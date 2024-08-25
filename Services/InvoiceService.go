@@ -27,6 +27,7 @@ type (
 		UpdateNote(request *Dto.UpdateNoteRequest) error
 		UpdateStatus(request *Dto.UpdateStatusRequest) error
 		DeleteInvoice(request Dto.IdRequest) error
+		UpdateDocument(request Dto.UpdateDocumentRequest) error
 	}
 
 	InvoiceService struct {
@@ -52,7 +53,6 @@ func (h *InvoiceService) AddInvoice(request *Dto.CreateInvoiceRequest) error {
 	if err != nil {
 		return err
 	}
-
 	return h.InvoiceRepository.Create(request)
 }
 
@@ -166,4 +166,8 @@ func createInvoiceCode(invoice *Model.Invoice) (val string, err error) {
 	}
 
 	return fmt.Sprintf("%d/%s/CTE276/SBY/%d", order, month, year-2000), nil
+}
+
+func (h *InvoiceService) UpdateDocument(request Dto.UpdateDocumentRequest) error {
+	return h.InvoiceRepository.UpdateDocument(request)
 }

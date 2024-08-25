@@ -18,8 +18,8 @@ type Invoice struct {
 	PlatformDescription string
 	Tax                 int
 	Note                string
-	FacturePath         string
-	PoPath              string
+	FacturePath         *string
+	PoPath              *string
 	Discount            int
 	IsTaxable           bool
 	PaymentTerm         int

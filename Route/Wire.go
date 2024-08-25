@@ -8,6 +8,7 @@ import (
 	"ct-backend/Middleware"
 	"ct-backend/Repository"
 	"ct-backend/Services"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/google/wire"
 	"gorm.io/gorm"
 )
@@ -69,14 +70,16 @@ func PurchaseDI(db *gorm.DB) *Controller.PurchaseController {
 	return &Controller.PurchaseController{}
 }
 
-func InvoiceDI(db *gorm.DB) *Controller.InvoiceController {
+func InvoiceDI(db *gorm.DB, svc *s3.Client) *Controller.InvoiceController {
 	panic(wire.Build(wire.NewSet(
 		Repository.ProductRepositoryProvider,
 		Repository.InvoiceRepositoryProvider,
 		Services.InvoiceServiceProvider,
+		Services.StorageServiceProvider,
 		Controller.InvoiceControllerProvider,
 
 		wire.Bind(new(Controller.IInvoiceController), new(*Controller.InvoiceController)),
+		wire.Bind(new(Services.IStorageService), new(*Services.StorageService)),
 		wire.Bind(new(Services.IInvoiceService), new(*Services.InvoiceService)),
 		wire.Bind(new(Repository.IInvoiceRepository), new(*Repository.InvoiceRepository)),
 		wire.Bind(new(Repository.IProductRepository), new(*Repository.ProductRepository)),

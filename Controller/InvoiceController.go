@@ -1,6 +1,8 @@
 package Controller
 
 import (
+	"ct-backend/Model"
+	"ct-backend/Model/Common"
 	"ct-backend/Model/Dto"
 	"ct-backend/Services"
 	"github.com/gin-gonic/gin"
@@ -23,16 +25,22 @@ type (
 		UpdateStatus(ctx *gin.Context)
 		GetAllSale(ctx *gin.Context)
 		DeleteInvoice(ctx *gin.Context)
+		UpdatePoFile(ctx *gin.Context)
+		GetPoUrl(ctx *gin.Context)
+		UpdateFakturFile(ctx *gin.Context)
+		GetFakturUrl(ctx *gin.Context)
 	}
 
 	InvoiceController struct {
 		InvoiceService Services.IInvoiceService
+		StorageService Services.IStorageService
 	}
 )
 
-func InvoiceControllerProvider(invoiceService Services.IInvoiceService) *InvoiceController {
+func InvoiceControllerProvider(invoiceService Services.IInvoiceService, storageService Services.IStorageService) *InvoiceController {
 	return &InvoiceController{
 		InvoiceService: invoiceService,
+		StorageService: storageService,
 	}
 }
 
@@ -318,5 +326,163 @@ func (h *InvoiceController) DeleteInvoice(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "success",
+	})
+}
+
+func (h *InvoiceController) UpdatePoFile(ctx *gin.Context) {
+	var FileObj *Common.FileDto
+	if err := ctx.ShouldBind(&FileObj); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	invoiceId, err := strconv.Atoi(ctx.Param("invoiceId"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "invoiceId must be a number",
+		})
+		return
+	}
+
+	if FileObj.Data == "" || FileObj.Data == "null" {
+		err = h.InvoiceService.UpdateDocument(Dto.UpdateDocumentRequest{
+			InvoiceId:    invoiceId,
+			DocumentType: "po_path",
+			DocumentPath: FileObj.File.Filename,
+		})
+
+		if err != nil {
+			ctx.JSON(http.StatusBadGateway, gin.H{
+				"message": err.Error(),
+			})
+			return
+		} else {
+			FileObj.Data = FileObj.File.Filename
+		}
+	}
+
+	if err = h.StorageService.UploadFile(&Model.S3ObjectRequest{
+		File:   FileObj.File,
+		Bucket: "cahaya-teknik",
+		Key:    "invoice-po/" + FileObj.Data,
+	}); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "success",
+		"data":    FileObj.Data,
+	})
+}
+
+func (h *InvoiceController) GetPoUrl(ctx *gin.Context) {
+	var request *Dto.GetDocumentUrlRequest
+
+	if err := ctx.ShouldBind(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	url, err := h.StorageService.GeneratePresignedURL(&Model.S3UrlRequest{
+		Bucket: "cahaya-teknik",
+		Key:    "invoice-po/" + request.Key,
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "success",
+		"data":    url,
+	})
+}
+
+func (h *InvoiceController) UpdateFakturFile(ctx *gin.Context) {
+	var FileObj *Common.FileDto
+	if err := ctx.ShouldBind(&FileObj); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	invoiceId, err := strconv.Atoi(ctx.Param("invoiceId"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "invoiceId must be a number",
+		})
+		return
+	}
+
+	if FileObj.Data == "" || FileObj.Data == "null" {
+		err = h.InvoiceService.UpdateDocument(Dto.UpdateDocumentRequest{
+			InvoiceId:    invoiceId,
+			DocumentType: "faktur",
+			DocumentPath: FileObj.File.Filename,
+		})
+
+		if err != nil {
+			ctx.JSON(http.StatusBadGateway, gin.H{
+				"message": err.Error(),
+			})
+			return
+		} else {
+			FileObj.Data = FileObj.File.Filename
+		}
+	}
+
+	if err = h.StorageService.UploadFile(&Model.S3ObjectRequest{
+		File:   FileObj.File,
+		Bucket: "cahaya-teknik",
+		Key:    "invoice-faktur/" + FileObj.Data,
+	}); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "success",
+		"data":    FileObj.Data,
+	})
+}
+
+func (h *InvoiceController) GetFakturUrl(ctx *gin.Context) {
+	var request *Dto.GetDocumentUrlRequest
+
+	if err := ctx.ShouldBind(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	url, err := h.StorageService.GeneratePresignedURL(&Model.S3UrlRequest{
+		Bucket: "cahaya-teknik",
+		Key:    "invoice-faktur/" + request.Key,
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "success",
+		"data":    url,
 	})
 }

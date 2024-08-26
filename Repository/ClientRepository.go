@@ -35,8 +35,8 @@ func (h *ClientRepository) GetAll() (clients []Model.Client, err error) {
 func (h *ClientRepository) Create(client *Dto.CreateClientRequest) error {
 	newClient := &Model.Client{
 		Name:      client.Name,
-		Place:     "",
-		Telephone: "",
+		Place:     client.Address,
+		Telephone: client.Telephone,
 	}
 
 	if err := h.DB.Create(&newClient).Error; err != nil {
@@ -49,8 +49,8 @@ func (h *ClientRepository) Create(client *Dto.CreateClientRequest) error {
 func (h *ClientRepository) Update(client *Dto.UpdateClientRequest) error {
 	clientData := &Model.Client{
 		Name:      client.Name,
-		Place:     "",
-		Telephone: "",
+		Place:     client.Address,
+		Telephone: client.Telephone,
 	}
 
 	if err := h.DB.Model(&Model.Client{}).Where("id = ?", client.ID).Updates(clientData).Error; err != nil {

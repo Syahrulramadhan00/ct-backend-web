@@ -16,6 +16,7 @@ type (
 		AddInvoiceReceipt(receiptInvoice *Dto.ReceiptInvoiceRequest) (*Model.ReceiptInvoice, error)
 		DeleteInvoiceReceipt(id int) error
 		LockReceipt(receiptId int) error
+		PayReceipt(receiptId int) error
 	}
 
 	ReceiptRepository struct {
@@ -127,6 +128,37 @@ func (h *ReceiptRepository) DeleteInvoiceReceipt(id int) error {
 
 func (h *ReceiptRepository) LockReceipt(receiptId int) error {
 	if err := h.DB.Model(&Model.Receipt{}).Where("id = ?", receiptId).Update("status", 2).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *ReceiptRepository) PayReceipt(receiptId int) error {
+	if err := h.DB.Model(&Model.Receipt{}).Where("id = ?", receiptId).Update("status", 3).Error; err != nil {
+		return err
+	}
+
+	err := h.DB.Transaction(func(tx *gorm.DB) error {
+		var receiptInvoices []Model.ReceiptInvoice
+		if err := tx.Preload("Invoice").Where("receipt_id = ?", receiptId).Find(&receiptInvoices).Error; err != nil {
+			return err
+		}
+
+		for _, receiptInvoice := range receiptInvoices {
+			if err := tx.Model(&Model.Invoice{}).Where("id = ?", receiptInvoice.InvoiceId).Update("invoice_status_id", 8).Error; err != nil {
+				return err
+			}
+		}
+
+		if err := tx.Model(&Model.Receipt{}).Where("id = ?", receiptId).Update("status", 3).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return err
 	}
 

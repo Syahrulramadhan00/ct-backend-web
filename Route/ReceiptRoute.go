@@ -19,4 +19,5 @@ func InitReceipt(c *gin.RouterGroup, db *gorm.DB) {
 	c.DELETE("/delete-invoice-receipt/:id", r.DeleteReceiptInvoice)
 	c.GET("/get-receipt-invoices/:id", r.GetAvailableInvoices)
 	c.GET("/get-client-receipts", r.GetClientReceipts)
+	c.POST("/pay-receipt", r.PayReceipt)
 }

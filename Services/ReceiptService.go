@@ -18,6 +18,7 @@ type (
 		DeleteReceiptInvoice(id int) error
 		GetAvailableInvoices(clientId int) ([]Model.Invoice, error)
 		GetClientReceipts() ([]Model.Client, error)
+		PayReceipt(receiptId int) error
 	}
 
 	ReceiptService struct {
@@ -107,4 +108,8 @@ func (h *ReceiptService) GetClientReceipts() ([]Model.Client, error) {
 		}
 	}
 	return uniqueClients, nil
+}
+
+func (h *ReceiptService) PayReceipt(receiptId int) error {
+	return h.ReceiptRepository.PayReceipt(receiptId)
 }

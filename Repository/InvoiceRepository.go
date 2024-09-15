@@ -42,7 +42,7 @@ func InvoiceRepositoryProvider(DB *gorm.DB) *InvoiceRepository {
 }
 
 func (h *InvoiceRepository) GetAll() (invoices []Model.Invoice, err error) {
-	if err := h.DB.Preload("Client").Find(&invoices).Error; err != nil {
+	if err := h.DB.Preload("Client").Order("created_at DESC").Find(&invoices).Error; err != nil {
 		return nil, err
 	}
 

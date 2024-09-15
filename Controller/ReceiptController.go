@@ -19,6 +19,7 @@ type (
 		DeleteReceiptInvoice(ctx *gin.Context)
 		GetAvailableInvoices(ctx *gin.Context)
 		GetClientReceipts(ctx *gin.Context)
+		PayReceipt(ctx *gin.Context)
 	}
 
 	ReceiptController struct {
@@ -223,5 +224,28 @@ func (h *ReceiptController) GetClientReceipts(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{
 		"message": "success",
 		"data":    clientReceipts,
+	})
+}
+
+func (h *ReceiptController) PayReceipt(ctx *gin.Context) {
+	var request *Dto.IdRequest
+
+	if err := ctx.ShouldBind(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	err := h.service.PayReceipt(request.Id)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "success",
 	})
 }

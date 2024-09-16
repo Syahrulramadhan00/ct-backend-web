@@ -71,9 +71,14 @@ func (h *InvoiceRepository) GetById(id int) (invoice Model.Invoice, err error) {
 
 func (h *InvoiceRepository) Create(request *Dto.CreateInvoiceRequest) (err error) {
 	invoice := &Model.Invoice{
-		ClientId:        request.ClientId,
-		InvoiceCode:     request.InvoiceCode,
-		InvoiceStatusId: 1,
+		ClientId:            request.ClientId,
+		InvoiceCode:         request.InvoiceCode,
+		Seller:              request.Seller,
+		Platform:            request.Platform,
+		PaymentMethod:       request.PaymentMethod,
+		PlatformDescription: request.PlatformDescription,
+		PlatformNumber:      request.PlatformNumber,
+		InvoiceStatusId:     1,
 	}
 
 	if err := h.DB.Create(&invoice).Error; err != nil {

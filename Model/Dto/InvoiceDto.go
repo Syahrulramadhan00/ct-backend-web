@@ -1,8 +1,13 @@
 package Dto
 
 type CreateInvoiceRequest struct {
-	ClientId    int    `json:"client_id" binding:"required"`
-	InvoiceCode string `json:"invoice_code"`
+	ClientId            int    `json:"client_id" binding:"required"`
+	InvoiceCode         string `json:"invoice_code"`
+	Seller              string `json:"seller"`
+	Platform            string `json:"platform"`
+	PaymentMethod       string `json:"payment_method"`
+	PlatformDescription string `json:"platform_description"`
+	PlatformNumber      string `json:"platform_number"`
 }
 
 type UpdateDocumentRequest struct {

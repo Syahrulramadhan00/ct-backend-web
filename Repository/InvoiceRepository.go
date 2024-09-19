@@ -5,6 +5,7 @@ import (
 	"ct-backend/Model/Dto"
 	"errors"
 	"gorm.io/gorm"
+	"math"
 )
 
 type (
@@ -270,6 +271,7 @@ func (h *InvoiceRepository) GetAllForReceipt() (invoices []Model.Invoice, err er
 
 func (h *InvoiceRepository) UpdateInvoiceTotalPrice(invoiceID int) error {
 	var total float64
+	var invoice Model.Invoice
 
 	err := h.DB.Model(&Model.Sale{}).
 		Where("invoice_id = ?", invoiceID).
@@ -277,6 +279,15 @@ func (h *InvoiceRepository) UpdateInvoiceTotalPrice(invoiceID int) error {
 		Scan(&total).Error
 	if err != nil {
 		return err
+	}
+
+	invoice, err = h.GetById(invoiceID)
+	if err != nil {
+		return err
+	}
+
+	if invoice.IsTaxable {
+		total = math.Round(total * 1.11)
 	}
 
 	err = h.DB.Model(&Model.Invoice{}).

@@ -1,2 +1,4 @@
 wire-gen :
-	wire gen ct-backend/Route
+	cd Route
+	wire gen
+	cd ..

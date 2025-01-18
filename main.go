@@ -1,11 +1,8 @@
 package main
 
 import (
-	"context"
 	"ct-backend/Config"
 	"ct-backend/Route"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -48,15 +45,8 @@ func main() {
 		serve = ":" + port
 	}
 
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-1"))
-	if err != nil {
-		log.Fatalf("unable to load SDK config, %v", err)
-	}
-
-	svc := s3.NewFromConfig(cfg)
-
 	// init route and DI
-	Route.Init(server, db, svc)
+	Route.Init(server, db)
 
 	if err := server.Run(serve); err != nil {
 		log.Fatalf("error running server: %v", err)

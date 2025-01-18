@@ -11,7 +11,6 @@ import (
 	"ct-backend/Middleware"
 	"ct-backend/Repository"
 	"ct-backend/Services"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"gorm.io/gorm"
 )
 
@@ -46,12 +45,12 @@ func PurchaseDI(db *gorm.DB) *Controller.PurchaseController {
 	return purchaseController
 }
 
-func InvoiceDI(db *gorm.DB, svc *s3.Client) *Controller.InvoiceController {
+func InvoiceDI(db *gorm.DB) *Controller.InvoiceController {
 	invoiceRepository := Repository.InvoiceRepositoryProvider(db)
 	productRepository := Repository.ProductRepositoryProvider(db)
 	invoiceService := Services.InvoiceServiceProvider(invoiceRepository, productRepository)
-	storageService := Services.StorageServiceProvider(svc)
-	invoiceController := Controller.InvoiceControllerProvider(invoiceService, storageService)
+	minioService := Services.MinioServiceProvider()
+	invoiceController := Controller.InvoiceControllerProvider(invoiceService, minioService)
 	return invoiceController
 }
 

@@ -50,11 +50,13 @@ func (h *InvoiceService) AddInvoice(request *Dto.CreateInvoiceRequest) error {
 	}
 
 	request.InvoiceCode, err = createInvoiceCode(invoice)
-	request.Seller = invoice.Seller
-	request.Platform = invoice.Platform
-	request.PaymentMethod = invoice.PaymentMethod
-	request.PlatformDescription = invoice.PlatformDescription
-	request.PlatformNumber = invoice.PlatformNumber
+	if invoice != nil {
+		request.Seller = invoice.Seller
+		request.Platform = invoice.Platform
+		request.PaymentMethod = invoice.PaymentMethod
+		request.PlatformDescription = invoice.PlatformDescription
+		request.PlatformNumber = invoice.PlatformNumber
+	}
 
 	if err != nil {
 		return err

@@ -1,13 +1,12 @@
 package Route
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func InitInvoice(c *gin.RouterGroup, db *gorm.DB, svc *s3.Client) {
-	r := InvoiceDI(db, svc)
+func InitInvoice(c *gin.RouterGroup, db *gorm.DB) {
+	r := InvoiceDI(db)
 	m := CommonMiddlewareDI()
 
 	c.Use(m.Authentication)

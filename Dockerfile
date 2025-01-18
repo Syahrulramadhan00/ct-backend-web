@@ -1,12 +1,24 @@
-FROM golang:latest
+# Stage 1: Build
+FROM golang:1.22-alpine as builder
 
-RUN mkdir /app
-ADD . /app
 WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod tidy
+
+COPY . .
+
 RUN go build -o main .
 
-RUN touch .env
+# Stage 2: Final image (using a lightweight image like Alpine)
+FROM alpine:latest
 
-EXPOSE 8888
+WORKDIR /app
 
-CMD ["sh", "-c", "/app/main"]
+COPY --from=builder /app/main .
+
+COPY .env /app/.env
+
+EXPOSE ${SERVER_PORT}
+
+CMD ["/app/main"]

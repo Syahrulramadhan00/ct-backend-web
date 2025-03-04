@@ -6,10 +6,11 @@ import (
 	"ct-backend/Repository"
 	"ct-backend/Utils"
 	"errors"
-	"golang.org/x/crypto/bcrypt"
+	"fmt"
 	"math/rand"
 	"strconv"
 	"time"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type (
@@ -83,6 +84,7 @@ func (h *AuthService) RequestOtp(email string) (err error) {
 		"OTP Code for "+email,
 		"Your OTP Code is: "+strconv.Itoa(randomNumber),
 	); err != nil {
+		fmt.Println("Failed send OTP:", err)
 		return err
 	}
 

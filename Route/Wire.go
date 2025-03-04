@@ -146,3 +146,18 @@ func ReceiptDI(db *gorm.DB) *Controller.ReceiptController {
 	))
 	return &Controller.ReceiptController{}
 }
+
+func AnalyticDI(db *gorm.DB) *Controller.AnalyticController {
+	panic(wire.Build(wire.NewSet(
+		Repository.AnalyticRepositoryProvider,
+		Services.AnalyticServiceProvider,
+		Controller.AnalyticControllerProvider,
+
+		wire.Bind(new(Controller.IAnalyticController), new(*Controller.AnalyticController)),
+		wire.Bind(new(Services.IAnalyticService), new(*Services.AnalyticService)),
+		wire.Bind(new(Repository.IAnalyticRepository), new(*Repository.AnalyticRepository)),
+	),
+	))
+	return &Controller.AnalyticController{}
+}
+

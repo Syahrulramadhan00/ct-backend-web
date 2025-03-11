@@ -4,6 +4,7 @@ import (
 	"ct-backend/Services"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
 type (
@@ -11,6 +12,8 @@ type (
 		GetRevenueStream(ctx *gin.Context)
 		GetStockMonitoring(ctx *gin.Context)
 		GetHighestSales(ctx *gin.Context)
+		GetExpenses(ctx *gin.Context)
+		GetTopSpenders(ctx *gin.Context)
 	}
 
 	AnalyticController struct {
@@ -23,40 +26,100 @@ func AnalyticControllerProvider(service Services.IAnalyticService) *AnalyticCont
 }
 
 func (c *AnalyticController) GetRevenueStream(ctx *gin.Context) {
-	data, err := c.service.GetRevenueStream()
+	startDateStr := ctx.Query("startDate") // e.g., "2024-01"
+	endDateStr := ctx.Query("endDate")     // e.g., "2024-06"
+
+	startDate, err := time.Parse("2006-01", startDateStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid startDate format. Use YYYY-MM"})
+		return
+	}
+
+	endDate, err := time.Parse("2006-01", endDateStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid endDate format. Use YYYY-MM"})
+		return
+	}
+
+	data, err := c.service.GetRevenueStream(startDate, endDate)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "success", "data": data})
+}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "success",
-		"data":    data,
-	})
+func (c *AnalyticController) GetExpenses(ctx *gin.Context) {
+	startDateStr := ctx.Query("startDate") // e.g., "2024-01"
+	endDateStr := ctx.Query("endDate")     // e.g., "2024-06"
+
+	startDate, err := time.Parse("2006-01", startDateStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid startDate format. Use YYYY-MM"})
+		return
+	}
+
+	endDate, err := time.Parse("2006-01", endDateStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid endDate format. Use YYYY-MM"})
+		return
+	}
+
+	data, err := c.service.GetExpenses(startDate, endDate)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "success", "data": data})
 }
 
 func (c *AnalyticController) GetStockMonitoring(ctx *gin.Context) {
-	data, err := c.service.GetStockMonitoring()
+	yearMonth := ctx.Query("yearMonth") // e.g., "2024-02"
+
+	_, err := time.Parse("2006-01", yearMonth)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid yearMonth format. Use YYYY-MM"})
+		return
+	}
+
+	data, err := c.service.GetStockMonitoring(yearMonth)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "success",
-		"data":    data,
-	})
+	ctx.JSON(http.StatusOK, gin.H{"message": "success", "data": data})
 }
 
 func (c *AnalyticController) GetHighestSales(ctx *gin.Context) {
-	data, err := c.service.GetHighestSales()
+	yearMonth := ctx.Query("yearMonth") // e.g., "2024-02"
+
+	_, err := time.Parse("2006-01", yearMonth)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid yearMonth format. Use YYYY-MM"})
+		return
+	}
+
+	data, err := c.service.GetHighestSales(yearMonth)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "success", "data": data})
+}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "success",
-		"data":    data,
-	})
+func (c *AnalyticController) GetTopSpenders(ctx *gin.Context) {
+	yearMonth := ctx.Query("yearMonth") // e.g., "2024-02"
+
+	_, err := time.Parse("2006-01", yearMonth)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid yearMonth format. Use YYYY-MM"})
+		return
+	}
+
+	data, err := c.service.GetTopSpenders(yearMonth)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "success", "data": data})
 }

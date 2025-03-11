@@ -14,4 +14,6 @@ func InitAnalytic(c *gin.RouterGroup, db *gorm.DB) {
 	c.GET("/get-revenue-stream", r.GetRevenueStream)
 	c.GET("/get-stock-monitoring", r.GetStockMonitoring)
 	c.GET("/get-highest-sales", r.GetHighestSales)
+	c.GET("/get-expenses", r.GetExpenses)
+	c.GET("/get-top-spenders", r.GetTopSpenders)
 }

@@ -29,6 +29,7 @@ func PurchaseRepositoryProvider(DB *gorm.DB) *PurchaseRepository {
 func (h *PurchaseRepository) AddPurchase(request *Dto.CreatePurchaseRequest) (err error) {
 	purchase := &Model.Purchase{
 		ProductId: request.ProductId,
+		SupplierId: request.SupplierId,
 		Count:     request.Count,
 		Price:     request.Price,
 		IsPaid:    request.IsPaid,

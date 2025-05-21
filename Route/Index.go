@@ -16,4 +16,5 @@
 		InitUser(prefix, db)
 		InitReceipt(prefix, db)
 		InitAnalytic(prefix, db)
+		InitSupplier(prefix, db)
 	}

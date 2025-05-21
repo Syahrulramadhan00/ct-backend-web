@@ -10,9 +10,10 @@ type (
 	IAnalyticService interface {
 		GetRevenueStream(startDate time.Time, endDate time.Time) (Dto.ChartData, error)
 		GetStockMonitoring(yearMonth string) (Dto.ChartData, error)
-		GetHighestSales(yearMonth string) (Dto.ChartData, error)
+		GetHighestSales(startDate, endDate time.Time) (Dto.ChartData, error)
 		GetExpenses(startDate time.Time, endDate time.Time) (Dto.ChartData, error)
 		GetTopSpenders(yearMonth string) (Dto.ChartData, error)
+		GetAvailableMonths(table string) ([]string, []string, error)
 	}
 
 	AnalyticService struct {
@@ -35,8 +36,8 @@ func (s *AnalyticService) GetStockMonitoring(yearMonth string) (Dto.ChartData, e
 }
 
 
-func (s *AnalyticService) GetHighestSales(yearMonth string) (Dto.ChartData, error) {
-	return s.AnalyticRepository.GetHighestSales()
+func (s *AnalyticService) GetHighestSales(startDate, endDate time.Time) (Dto.ChartData, error) {
+	return s.AnalyticRepository.GetHighestSales(startDate, endDate)
 }
 
 
@@ -47,4 +48,8 @@ func (s *AnalyticService) GetExpenses(startDate, endDate time.Time) (Dto.ChartDa
 
 func (s *AnalyticService) GetTopSpenders(yearMonth string) (Dto.ChartData, error) {
 	return s.AnalyticRepository.GetTopSpenders()
+}
+
+func (s *AnalyticService) GetAvailableMonths(tableName string) ([]string, []string, error) {
+    return s.AnalyticRepository.GetAvailableMonths(tableName)
 }

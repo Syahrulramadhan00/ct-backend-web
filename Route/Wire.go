@@ -161,3 +161,16 @@ func AnalyticDI(db *gorm.DB) *Controller.AnalyticController {
 	return &Controller.AnalyticController{}
 }
 
+func SupplierDI(db *gorm.DB) *Controller.SupplierController {
+	panic(wire.Build(wire.NewSet(
+		Repository.SupplierRepositoryProvider,
+		Services.SupplierServiceProvider,
+		Controller.SupplierControllerProvider,
+
+		wire.Bind(new(Controller.ISupplierController), new(*Controller.SupplierController)),
+		wire.Bind(new(Services.ISupplierService), new(*Services.SupplierService)),
+		wire.Bind(new(Repository.ISupplierRepository), new(*Repository.SupplierRepository)),
+	),
+	))
+	return &Controller.SupplierController{}
+}

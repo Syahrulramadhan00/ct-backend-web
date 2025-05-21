@@ -90,3 +90,10 @@ func AnalyticDI(db *gorm.DB) *Controller.AnalyticController {
 	analyticController := Controller.AnalyticControllerProvider(analyticService)
 	return analyticController
 }
+
+func SupplierDI(db *gorm.DB) *Controller.SupplierController {
+	supplierRepository := Repository.SupplierRepositoryProvider(db)
+	supplierService := Services.SupplierServiceProvider(supplierRepository)
+	supplierController := Controller.SupplierControllerProvider(supplierService)
+	return supplierController
+}

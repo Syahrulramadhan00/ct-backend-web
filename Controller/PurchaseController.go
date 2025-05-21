@@ -27,7 +27,7 @@ func PurchaseControllerProvider(purchaseService Services.IPurchaseService) *Purc
 }
 
 func (h *PurchaseController) CreatePurchase(ctx *gin.Context) {
-	var request *Dto.CreatePurchaseRequest
+	var request Dto.CreatePurchaseRequest
 
 	if err := ctx.ShouldBind(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -36,7 +36,7 @@ func (h *PurchaseController) CreatePurchase(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.PurchaseService.AddPurchase(request); err != nil {
+	if err := h.PurchaseService.AddPurchase(&request); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{
 			"message": err.Error(),
 		})

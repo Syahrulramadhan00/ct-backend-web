@@ -19,10 +19,18 @@ type HighestSales struct {
 
 type Expenses struct {    
 	Month string  `gorm:"column:month"`
-	Total float64 `gorm:"column:total_expenses"` // FIXED TYPO
+	Total float64 `gorm:"column:total_expenses"` 
 }
 
 type TopSpenders struct { 
 	Name  string `gorm:"column:name"`
 	Total float64 `gorm:"column:total"`
+}
+
+type LatestBill struct {
+	CodeInvoices string `gorm:"column:invoice_code"`
+	ClientName   string `gorm:"column:client_name"`
+	ClientContact string `gorm:"column:client_contact"`
+	TotalAmount  int    `gorm:"column:total_amount"`
+	PaymentStatus string `gorm:"column:payment_status"`
 }

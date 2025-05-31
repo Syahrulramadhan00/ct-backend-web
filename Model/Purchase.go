@@ -13,4 +13,5 @@ type Purchase struct {
 	CreatedAt  time.Time
 
 	Product  Product  `gorm:"foreignKey:ProductId"`
+	Supplier Supplier `gorm:"foreignKey:SupplierId"`
 }

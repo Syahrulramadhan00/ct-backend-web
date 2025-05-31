@@ -14,6 +14,7 @@ type (
 		GetExpenses(startDate time.Time, endDate time.Time) (Dto.ChartData, error)
 		GetTopSpenders(yearMonth string) (Dto.ChartData, error)
 		GetAvailableMonths(table string) ([]string, []string, error)
+		GetLatestBill() ([]Dto.LatestBillDTO, error)
 	}
 
 	AnalyticService struct {
@@ -52,4 +53,8 @@ func (s *AnalyticService) GetTopSpenders(yearMonth string) (Dto.ChartData, error
 
 func (s *AnalyticService) GetAvailableMonths(tableName string) ([]string, []string, error) {
     return s.AnalyticRepository.GetAvailableMonths(tableName)
+}
+
+func (s *AnalyticService) GetLatestBill() ([]Dto.LatestBillDTO, error) {
+	return s.AnalyticRepository.GetLatestBill()
 }

@@ -17,6 +17,7 @@ type (
 		GetExpenses(startDate, endDate time.Time) (Dto.ChartData, error)
 		GetTopSpenders() (Dto.ChartData, error)
 		GetAvailableMonths(string) ([]string, []string, error)
+		GetLatestBill() ([]Dto.LatestBillDTO, error)
 	}
 
 	AnalyticRepository struct {
@@ -119,7 +120,7 @@ func (r *AnalyticRepository) GetHighestSales(startDate, endDate time.Time) (Dto.
 	var sales []Model.HighestSales
 	var chartData Dto.ChartData
 
-	// Query the database with dynamic date range
+
 	err := r.DB.Model(&Model.Sale{}).
 		Select("p.name as product_name, SUM(sales.quantity) as total").
 		Joins("JOIN products p ON sales.product_id = p.id").
@@ -179,7 +180,7 @@ func (r *AnalyticRepository) GetAvailableMonths(tableName string) ([]string, []s
     var months []string
     var labels []string
 
-    // Ensure tableName is valid (Prevent SQL Injection)
+
     validTables := map[string]string{
         "sales":     "sales",
         "purchases": "purchases",
@@ -212,4 +213,33 @@ func (r *AnalyticRepository) GetAvailableMonths(tableName string) ([]string, []s
     }
 
     return months, labels, nil
+}
+
+
+func (r *AnalyticRepository) GetLatestBill() ([]Dto.LatestBillDTO, error) {
+	var latestBills []Dto.LatestBillDTO
+
+	err := r.DB.Model(&Model.Invoice{}).
+		Select(`
+			invoices.invoice_code,
+			clients.name AS client_name,
+			clients.telephone AS client_contact,
+			invoices.total_price AS total_amount,
+			CASE
+				WHEN invoice_statuses.name IN ('paid', 'done') THEN 'Paid'
+				ELSE 'Unpaid'
+			END AS payment_status
+		`).
+		Joins("JOIN clients ON invoices.client_id = clients.id").
+		Joins("JOIN invoice_statuses ON invoices.invoice_status_id = invoice_statuses.id").
+		Where("invoices.total_price > ?", 0). 
+		Order("invoices.updated_at DESC"). 
+		Limit(10).
+		Scan(&latestBills).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return latestBills, nil
 }

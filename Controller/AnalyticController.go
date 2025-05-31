@@ -15,6 +15,7 @@ type (
 		GetExpenses(ctx *gin.Context)
 		GetTopSpenders(ctx *gin.Context)
 		GetAvailableMonths(ctx *gin.Context)
+		GetLatestBill(ctx *gin.Context)
 	}
 
 	AnalyticController struct {
@@ -144,4 +145,13 @@ func (c *AnalyticController) GetAvailableMonths(ctx *gin.Context) {
 		"months": months,
 		"labels": labels, 
 	})
+}
+
+func (c *AnalyticController) GetLatestBill(ctx *gin.Context) {
+	data, err := c.service.GetLatestBill() // Call the service method
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "success", "data": data})
 }

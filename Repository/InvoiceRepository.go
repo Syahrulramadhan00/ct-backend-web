@@ -270,32 +270,32 @@ func (h *InvoiceRepository) GetAllForReceipt() (invoices []Model.Invoice, err er
 }
 
 func (h *InvoiceRepository) UpdateInvoiceTotalPrice(invoiceID int) error {
-	var total float64
-	var invoice Model.Invoice
+    var total float64 
+    var invoice Model.Invoice
 
-	err := h.DB.Model(&Model.Sale{}).
-		Where("invoice_id = ?", invoiceID).
-		Select("SUM(price * quantity) as total").
-		Scan(&total).Error
-	if err != nil {
-		return err
-	}
+    err := h.DB.Model(&Model.Sale{}).
+        Where("invoice_id = ?", invoiceID).
+        Select("COALESCE(SUM(price * quantity), 0) as total"). 
+        Scan(&total).Error
+    if err != nil {
+        return err
+    }
 
-	invoice, err = h.GetById(invoiceID)
-	if err != nil {
-		return err
-	}
+    invoice, err = h.GetById(invoiceID)
+    if err != nil {
+        return err
+    }
 
-	if invoice.IsTaxable {
-		total = math.Round(total * 1.11)
-	}
+    if invoice.IsTaxable {
+        total = math.Round(total * 1.11)
+    }
 
-	err = h.DB.Model(&Model.Invoice{}).
-		Where("id = ?", invoiceID).
-		Update("total_price", total).Error
-	if err != nil {
-		return err
-	}
+    err = h.DB.Model(&Model.Invoice{}).
+        Where("id = ?", invoiceID).
+        Update("total_price", total).Error
+    if err != nil {
+        return err
+    }
 
-	return nil
+    return nil
 }

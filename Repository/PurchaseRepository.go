@@ -44,7 +44,7 @@ func (h *PurchaseRepository) AddPurchase(request *Dto.CreatePurchaseRequest) (er
 }
 
 func (h *PurchaseRepository) GetAllPurchase() (purchases []Model.Purchase, err error) {
-	if err := h.DB.Preload("Product").Find(&purchases).Error; err != nil {
+	if err := h.DB.Preload("Product").Preload("Supplier").Find(&purchases).Error; err != nil {
 		return nil, err
 	}
 

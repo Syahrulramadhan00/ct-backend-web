@@ -226,8 +226,8 @@ func (r *AnalyticRepository) GetLatestBill() ([]Dto.LatestBillDTO, error) {
 			clients.telephone AS client_contact,
 			invoices.total_price AS total_amount,
 			CASE
-				WHEN invoice_statuses.name IN ('paid', 'done') THEN 'Paid'
-				ELSE 'Unpaid'
+				WHEN invoice_statuses.name IN ('paid', 'done') THEN 'Lunas'
+				ELSE 'Belum Lunas'
 			END AS payment_status
 		`).
 		Joins("JOIN clients ON invoices.client_id = clients.id").
